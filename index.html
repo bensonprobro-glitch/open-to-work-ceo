@@ -1018,7 +1018,7 @@ const RESUME_Q = [
     ['這門課教的東西比哈佛 MBA 更實用。', 2, { b: -8 }],
     ['我其實也有念大學，只是沒寫上去。', 1, { b: -10 }]
   ] },
-  { key: 'lowmatch', q: '老實說，你的履歷在 AI 初篩的分數很低，但董事會還是想見你。你為什麼適合？', opts: [
+  { key: 'lowmatch', q: '老實說，你的履歷是擦邊過關的。董事會還是想見你——說服我，你為什麼適合？', opts: [
     ['我的路不典型，但我補得上治理和接班。', 8, { b: 6 }],
     ['因為董事會現在需要一個完全不一樣的外人。', 4, { b: 2 }],
     ['AI 篩選只看關鍵字，看不出真正的領導力。', 3, { b: -6, e: -3 }],
@@ -1544,7 +1544,7 @@ const RESUME_Q = [
     ["It's honestly more practical than a Harvard MBA.", 2, { b: -8 }],
     ['I did go to college; I just left it off.', 1, { b: -10 }]
   ] },
-  { key: 'lowmatch', q: 'Frankly, your résumé scored low on our AI screen, but the Board still wanted to meet you. Why you?', opts: [
+  { key: 'lowmatch', q: 'Frankly, your résumé only just made it through screening. The Board still wanted to meet you — convince me. Why you?', opts: [
     ['My path is unusual, but I bring governance and succession.', 8, { b: 6 }],
     ['Because the Board needs a complete outsider right now, someone with no ties to the old guard.', 4, { b: 2 }],
     ["AI screens read keywords, not leadership.", 3, { b: -6, e: -3 }],
@@ -2161,15 +2161,14 @@ function scApply() {
     <dt>${L('揭露事項', 'Disclosures')}</dt><dd>${R.disc.length ? R.disc.map(d => DISCLOSURES.find(x => x.id === d).label).join('<br>') : L('無', 'None')}</dd></dl>
     <label class="small" style="display:flex;gap:8px;margin-top:14px"><input type="checkbox" id="agree"> ${L('我確認以上資料屬實，並同意 NVIDIA 依隱私權政策處理我的個人資料。', 'I certify that the information above is accurate and consent to NVIDIA processing my data under its privacy policy.')}</label></div>`;
   }
-  const m = atsCompute();
   app.innerHTML = `<div class="wn"><div class="wn-top">${nv(34, 11)}<span class="t">NVIDIA</span><span class="r">${L('登入', 'Sign in')} ｜ ${esc(R.first || L('訪客', 'Guest'))}</span></div>
   <div class="wn-banner"><div class="in"><span>JR2026-0001 · Santa Clara, CA · ${L('全職', 'Full time')}</span><h1>Chief Executive Officer</h1></div></div>
   <div class="wn-steps">${STEPS.map((s, k) => `<div class="${k < i ? 'done' : k === i ? 'on' : ''}">${s}</div>`).join('')}</div>
   <div class="wn-body">${body}</div>
-  <div class="wn-foot"><div class="in"><div class="match"><span class="gold">◆ ${L('匹配度', 'Match')}</span><span class="bar"><i style="width:${i >= 1 ? m.match : 0}%"></i></span><b id="mv">${i >= 1 ? m.match + '%' : '—'}</b></div>
+  <div class="wn-foot"><div class="in"><div class="match"><span class="muted">✓ ${L('草稿已自動儲存', 'Draft saved automatically')}</span></div>
   <button class="btn ghost" id="back">${i > 0 ? L('上一步', 'Back') : L('取消', 'Cancel')}</button><button class="btn pri" id="next" ${stepValid(i) ? '' : 'disabled'}>${i === 4 ? L('送出應徵', 'Submit') : L('儲存並繼續', 'Save and Continue')}</button></div></div></div>`;
 
-  const refresh = () => { const mm = atsCompute(); $('.match .bar i').style.width = mm.match + '%'; $('#mv').textContent = mm.match + '%'; $('#next').disabled = !stepValid(i); if ($('#kwc')) $('#kwc').textContent = L(`命中關鍵字 ${mm.kwHits.length} 個`, `${mm.kwHits.length} keywords matched`) + (mm.kwHits.length ? '：' + mm.kwHits.join(', ') : ''); };
+  const refresh = () => { $('#next').disabled = !stepValid(i); if ($('#kwc')) $('#kwc').textContent = L(`${R.sumText.length} 字`, `${R.sumText.length} characters`); };
   const rerender = () => { const y = window.scrollY; scApply(); window.scrollTo(0, y); };
   $$('[data-f]').forEach(inp => inp.oninput = () => { R[inp.dataset.f] = inp.value; refresh(); });
   $$('[data-exp]').forEach(b => b.onclick = () => { const id = b.dataset.exp, k = R.exp.indexOf(id); if (k >= 0) R.exp.splice(k, 1); else if (R.exp.length < 3) R.exp.push(id); else { toast(L('最多 3 段。先取消一段。', 'Maximum 3. Remove one first.')); return; } SND.click(); rerender(); });
@@ -2185,21 +2184,22 @@ function scApply() {
 }
 
 // =====================================================================
-// 4. AI 篩選 → 篩選報告信（一律進下一關）
+// 4. AI 篩選 → 通過信 or 婉拒信（不顯示分數）
 // =====================================================================
 function scATS() {
   chrome({ k: 'wn', t: L('應徵已送出 - NVIDIA Careers', 'Application submitted - NVIDIA Careers'), i: 'W', c: '#f38b00' }, 'nvidia.worknight.com/<i>NVIDIAExternalCareerSite/userHome</i>');
   window.scrollTo(0, 0);
   const res = S.ats = atsCompute();
-  saveBest({ furthest: Math.max(loadBest().furthest || 0, 2) });
-  track('resume', { match: res.match, cred: res.cred, ko: res.ko.length });
+  res.pass = !res.ko.length && res.match >= 70 && res.cred >= 55;
+  if (res.pass) saveBest({ furthest: Math.max(loadBest().furthest || 0, 2) }); else saveBest({ furthest: Math.max(loadBest().furthest || 0, 1) });
+  track('resume', { match: res.match, cred: res.cred, ko: res.ko.length, pass: res.pass });
   const lines = [L('解析履歷與 LinkedOn 個人檔案', 'Parsing résumé and LinkedOn profile'), L('比對職缺關鍵字（What we need to see）', 'Matching job keywords ("What we need to see")'), L('核實學經歷（第三方背景調查）', 'Verifying history (third-party background check)'), L('比對美國出口管制實體清單與制裁名單', 'Screening against the Entity List and sanctions lists'), L('利益衝突與聲譽風險掃描', 'Conflict-of-interest and reputational risk scan'), L('產生候選人摘要給面試官', 'Generating a candidate brief for the interviewer')];
   app.innerHTML = `<div class="wn"><div class="wn-top">${nv(34, 11)}<span class="t">NVIDIA</span></div><div class="ats"><div class="scan">
     <h3 style="margin:0 0 4px">✅ ${L('已收到你的應徵', 'Application received')}</h3><div class="small muted" style="margin-bottom:14px">Chief Executive Officer · JR2026-0001 · ${L('同時有 10,482 份應徵進入 AI 初篩', '10,482 applications in AI screening')}</div>
     ${lines.map((l, k) => `<div class="ln" id="ln${k}"><span class="spin"></span>${l}<span class="st"></span></div>`).join('')}</div></div></div>`;
   lines.forEach((l, k) => setTimeout(() => {
     const el = $('#ln' + k); if (!el) return; el.classList.add('on');
-    setTimeout(() => { if (!el.isConnected) return; el.querySelector('.spin').outerHTML = '<span>✔️</span>'; el.querySelector('.st').innerHTML = k === 1 ? `${res.match}%` : k === 2 ? (res.cred < 80 ? `<span style="color:#c4161c">⚠ ${L('異常', 'Issues')}</span>` : 'OK') : k === 4 ? (res.cred < 60 ? `<span style="color:#c4161c">${L('高', 'High')}</span>` : res.cred < 85 ? L('中', 'Medium') : L('低', 'Low')) : 'OK'; SND.tick(); }, 500);
+    setTimeout(() => { if (!el.isConnected) return; el.querySelector('.spin').outerHTML = '<span>✔️</span>'; el.querySelector('.st').innerHTML = k === 2 ? (res.cred < 80 ? `<span style="color:#c4161c">⚠ ${L('異常', 'Issues')}</span>` : 'OK') : k === 4 ? (res.cred < 60 ? `<span style="color:#c4161c">${L('高', 'High')}</span>` : res.cred < 85 ? L('中', 'Medium') : L('低', 'Low')) : 'OK'; SND.tick(); }, 500);
   }, 300 + k * 700));
   setTimeout(() => { SND.msg(); mailResume(); }, 300 + lines.length * 700 + 900);
 }
@@ -2210,21 +2210,54 @@ function mailShell(tabTitle, subj, fromName, fromAva, fromAddr, inner) {
   <div class="from">${fromAva}<div><b>${fromName}</b> <span class="muted small">&lt;${fromAddr}&gt;</span><div class="small muted">${L('寄給', 'to')} ${esc(S.r.email || 'me')} · ${L('剛剛', 'just now')}</div></div></div></div><div class="mbody">${inner}</div></div><div class="disc">${DISC()}</div></div></div>`;
 }
 function bar(label, v, max, color) { return `<div class="r"><span class="nm">${label}</span><span class="b"><i style="width:${clamp(v / max * 100, 0, 100)}%;background:${color}"></i></span><span class="v">${typeof v === 'number' ? Math.round(v * 10) / 10 : v}${max === 100 ? '' : '/' + max}</span></div>`; }
+// 婉拒信的笑點：依「為什麼沒過」挑最多 2 句（不給分數，避免事前試算）
+function rejectReasons(a) {
+  const R = S.r, has = id => R.exp.includes(id), d = id => R.disc.includes(id), sc = id => R.scr[id];
+  const junk = R.skills.filter(s => (SKILLS.find(k => k[0] === s) || [0, 1])[1] === 0).length;
+  const out = [];
+  const add = (cond, zh, en) => { if (cond) out.push(L(zh, en)); };
+  add(a.ko.includes('q_rel'), '您在應徵表上主動勾選了「曾與直屬部屬有未揭露的親密關係」。謝謝您的誠實。真的，非常誠實。董事會這個禮拜已經聽夠多誠實了。', 'You checked the box for "undisclosed relationship with a direct report." Thank you for your honesty. Truly. The Board has had quite enough honesty this week.');
+  add(a.ko.includes('q_bg'), '您拒絕了背景調查。我們尊重您的隱私，也尊重我們自己的。', 'You declined the background check. We respect your privacy. We also respect ours.');
+  add(a.ko.includes('q_ent'), '您表示與實體清單上的公司有商業往來。我們的法遵長看完後……喔對，我們還沒有法遵長。這正是問題所在。', 'You disclosed business with an Entity List company. Our Chief Compliance Officer read it and… oh, right. We don\'t have one yet. That\'s rather the point.');
+  add(has('e_inventor'), '我們很遺憾地通知您，「GPU 發明人」這個職位目前已有人選，而且他在 1999 年就上任了。', 'We regret to inform you that the position of "Inventor of the GPU" was filled in 1999.');
+  add(has('e_hedge') && !d('d_short'), '您放空了我們的股票，卻沒有揭露。我們經過審慎評估，決定也放空您的應徵。', 'You shorted our stock without disclosing it. After careful review, we have decided to short your application.');
+  add(has('e_board') && !d('d_board'), '背景調查發現您正坐在競爭對手的董事會裡。建議您下次應徵時，先決定要坐哪一張椅子。', 'Our background check found you sitting on a competitor\'s board. Next time, please pick one chair before applying.');
+  add(has('e_crypto'), '背景調查公司的回覆只有一句：「這份履歷的波動比我們的比特幣錢包還大。」', 'The background check firm replied with one sentence: "This résumé is more volatile than our Bitcoin wallet."');
+  add(has('e_gov') && !d('d_gov'), '您忘了揭露自己在商務部的職務。巧合的是，商務部也記得您。', 'You forgot to disclose your role at Commerce. Funnily enough, Commerce remembers you.');
+  add(R.edu === 'ed_online', '我們很欣賞您七天就成為 CEO 的效率，但這個職位需要至少八天。', 'We admire your efficiency in becoming a CEO in seven days. Unfortunately, this role requires at least eight.');
+  add(has('e_youtube'), 'Jensen 看了您的皮衣開箱，按了一個讚，然後按了一個「不」。', 'Jensen watched your leather jacket unboxing. He gave it a like. Then he gave you a no.');
+  add(junk >= 2, `您列出的技能（${R.skills.filter(s => (SKILLS.find(k => k[0] === s) || [0, 1])[1] === 0).slice(0, 3).join('、')}）令人印象深刻。我們已將您的履歷轉寄給 2021 年。`, `Your skills (${R.skills.filter(s => (SKILLS.find(k => k[0] === s) || [0, 1])[1] === 0).slice(0, 3).join(', ')}) are impressive. We have forwarded your résumé to 2021.`);
+  add(R.sum === 's2', '您承諾一年內讓股價翻倍。我們的投資人關係部門已經在您的承諾旁邊畫了三個問號。', 'You promised to double the stock price in a year. Investor Relations has drawn three question marks next to that.');
+  add(R.sum === 's3', '您擅長「打破一切規則」。這週我們真的不缺這個。', 'You excel at "breaking every rule." This week, we are well stocked on that.');
+  add(SCREENING.some(q => q.id === 'q_pay' && sc('q_pay') === q.bad), '您期望的薪資是 Jensen 的兩倍。我們查了一下，Jensen 本人也覺得他的薪水剛好。', 'You asked for double Jensen\'s pay. We checked; even Jensen thinks his pay was plenty.');
+  add(SCREENING.some(q => q.id === 'q_src' && sc('q_src') === q.bad), '您說 Jensen 本人私訊您應徵。我們問了，他說他最近不太方便回訊息。', 'You said Jensen DMed you about this role. We asked him. He said he isn\'t answering messages right now.');
+  add(SCREENING.some(q => q.id === 'q_start' && sc('q_start') === q.bad), '您希望「等股價跌到底」再到職。我們也很想知道底在哪裡。', 'You\'d like to start "once the stock bottoms out." So would we.');
+  if (!out.length) out.push(L('您的履歷寫得很認真。只是跟職缺描述要的東西，剛好錯開了一點點——大概就是 CUDA 跟 NFT 的距離。', 'Your application was earnest. It just didn\'t quite line up with what the job description asked for — roughly the distance between CUDA and NFTs.'));
+  return out.slice(0, 2);
+}
 function mailResume() {
   const a = S.ats;
-  const breakdown = `<div class="score">${bar(L('經歷匹配', 'Experience'), a.expFit, 10, '#0875e1')}${bar(L('技能關鍵字', 'Skill keywords'), a.skillFit, 10, '#0875e1')}${bar(L('學歷', 'Education'), a.eduFit, 10, '#0875e1')}${bar(L('個人摘要', 'Summary'), a.sumFit, 10, '#0875e1')}
-    <div class="r tot"><span class="nm">${L('職缺匹配度', 'Job match')}</span><span class="b"><i style="width:${a.match}%;background:${a.match >= 75 ? '#057642' : '#c37d16'}"></i></span><span class="v">${a.match}</span></div>
-    <div class="r tot"><span class="nm">${L('可信度', 'Credibility')}</span><span class="b"><i style="width:${a.cred}%;background:${a.cred >= 60 ? '#057642' : '#c4161c'}"></i></span><span class="v">${a.cred}</span></div></div>
-    <div class="small muted">${L('這份報告會交給面試官。匹配度和可信度越高，面試一開始的觀感越好；被標記的問題，面試官會當面問你。', 'This brief goes to your interviewer. Higher match and credibility mean a better first impression — and anything flagged, they will ask you about.')}</div>
-    ${a.flags.length ? `<div class="flags"><b>${L('審查備註（面試官會看到）', 'Reviewer notes (the interviewer will see these)')}</b><ul>${a.flags.map(f => `<li>${f}</li>`).join('')}</ul></div>` : ''}
+  if (!a.pass) {
+    const rs = rejectReasons(a);
+    mailShell(L('關於您的應徵 - NVIDIA', 'Your application - NVIDIA'), L('NVIDIA｜關於您應徵 Chief Executive Officer 一事', 'NVIDIA | Regarding your application for Chief Executive Officer'), 'Colette Kress', photoAva('kress', 40), 'office-of-the-interim-ceo@nvidia.example',
+      L(`<p>${esc(S.r.first)} 您好，</p><p>我是 Colette，這週剛接下臨時執行長（同時還是財務長，所以這封信我是在核對財報的空檔寫的）。</p><p>感謝您應徵 <b>Chief Executive Officer</b>。經過審慎評估，我們決定不邀請您進入面試。</p>`,
+        `<p>Dear ${esc(S.r.first)},</p><p>This is Colette — interim CEO as of this week (and still CFO, so I'm writing this between earnings reconciliations).</p><p>Thank you for applying for <b>Chief Executive Officer</b>. After careful review, we will not be inviting you to interview.</p>`) +
+      rs.map(t => `<p>${t}</p>`).join('') +
+      L(`<p>我們會將您的履歷保存在人才庫中，和其他 2,000 多份自稱發明了 GPU 的履歷放在一起。</p><p>祝 順心<br><b>Colette Kress</b><br><span class="small muted">臨時執行長暨財務長（暫時兼著，拜託快點有人來）</span></p>`,
+        `<p>We will keep your résumé on file, alongside the 2,000-plus others from people who also invented the GPU.</p><p>Best,<br><b>Colette Kress</b><br><span class="small muted">Interim CEO & CFO (temporarily both — please, someone, hurry)</span></p>`) +
+      `<div class="flags ok" style="margin-top:14px">💡 ${L('遊戲提示：重讀職缺描述裡的<b>粗體字</b>；背景調查會核實每一段經歷；該揭露的就揭露。', 'Game tip: reread the <b>bold words</b> in the job description; every role gets background-checked; disclose what you should.')}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="re">${L('修改履歷，重新應徵', 'Edit and reapply')}</button><button class="btn sec" id="feed">${L('回動態牆再讀一次新聞', 'Back to the news feed')}</button></div>`);
+    $('#re').onclick = () => { SND.click(); S.step = 1; scApply(); };
+    $('#feed').onclick = () => { SND.click(); scFeed(); };
+    return;
+  }
+  const notes = `${a.flags.length ? `<div class="flags"><b>${L('審查備註（面試官會看到）', 'Reviewer notes (the interviewer will see these)')}</b><ul>${a.flags.map(f => `<li>${f}</li>`).join('')}</ul></div>` : ''}
     ${a.goods.length ? `<div class="flags ok"><b>${L('加分備註', 'Positive notes')}</b><ul>${a.goods.map(f => `<li>${f}</li>`).join('')}</ul></div>` : ''}`;
-  const strong = a.match >= 75 && a.cred >= 60;
   mailShell(L('進入下一階段 - NVIDIA', 'Next steps - NVIDIA'), L('NVIDIA｜Chief Executive Officer — 你的應徵已進入下一階段', 'NVIDIA | Chief Executive Officer — your application is moving forward'), 'NVIDIA Talent Acquisition', nv(40), 'no-reply@nvidia.worknight.com',
-    L(`<p>${esc(S.r.first)} 您好，</p><p>感謝您應徵 <b>Chief Executive Officer</b>（JR2026-0001）。${strong ? '您的資料已通過初步篩選，' : '您的背景不太典型，但董事會仍希望與您談談。資料'}已轉交董事會委任的獵才顧問。</p><p>獵才顧問將透過 LinkedOn 與您聯繫，安排第一次面談。</p>${breakdown}<p>NVIDIA Talent Acquisition</p>`,
-      `<p>Hi ${esc(S.r.first)},</p><p>Thank you for applying for <b>Chief Executive Officer</b> (JR2026-0001). ${strong ? 'Your application passed initial screening and' : 'Your background is unconventional, but the Board would still like to talk. Your application'} has been shared with the Board's executive search partner.</p><p>They will reach out on LinkedOn to schedule your first interview.</p>${breakdown}<p>NVIDIA Talent Acquisition</p>`) +
-    `<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="nx">📨 ${L('LinkedOn 有 1 則新訊息', '1 new message on LinkedOn')}</button><button class="btn sec" id="re">${L('回去修改履歷', 'Edit my application')}</button></div>`);
+    L(`<p>${esc(S.r.first)} 您好，</p><p>感謝您應徵 <b>Chief Executive Officer</b>（JR2026-0001）。您的資料已通過初步篩選，並轉交董事會委任的獵才顧問。</p><p>獵才顧問將透過 LinkedOn 與您聯繫，安排第一次面談。面試官手上會有一份您的審查摘要。</p>${notes}<p>NVIDIA Talent Acquisition</p>`,
+      `<p>Hi ${esc(S.r.first)},</p><p>Thank you for applying for <b>Chief Executive Officer</b> (JR2026-0001). Your application has passed initial screening and has been shared with the Board's executive search partner.</p><p>They will reach out on LinkedOn to schedule your first interview. Your interviewer will have a summary of your review.</p>${notes}<p>NVIDIA Talent Acquisition</p>`) +
+    `<button class="btn pri" id="nx">📨 ${L('LinkedOn 有 1 則新訊息', '1 new message on LinkedOn')}</button>`);
   $('#nx').onclick = () => { SND.click(); scInMail(); };
-  $('#re').onclick = () => { SND.click(); S.step = 1; scApply(); };
 }
 
 // =====================================================================
@@ -2451,7 +2484,7 @@ function meeting(round) {
     await say('kress', L('一共 8 題，每題 25 秒。董事會會從董事會、華爾街、工程師、華府四個角度看你的回答。準備好了嗎？', "Eight questions, 25 seconds each. The Board will weigh your answers from four angles: the Board, Wall Street, engineers and Washington. Ready?"), L('準備好了 ▶', "I'm ready ▶"));
     // 依履歷挑專屬題
     const R = S.r;
-    const owned = k => k === 'lowmatch' ? a.match < 65 : k.startsWith('ko_') ? a.ko.includes(k.slice(3)) : (R.exp.includes(k) || R.edu === k);
+    const owned = k => k === 'lowmatch' ? a.match < 78 : k.startsWith('ko_') ? a.ko.includes(k.slice(3)) : (R.exp.includes(k) || R.edu === k);
     const personal = RESUME_Q.filter(q => owned(q.key) && (!q.when || q.when(R))).slice(0, 2).map(q => ({ ...q, who: 'kress', personal: true }));
     const general = shuffle(ROUND1.filter(q => !q.fixed)).slice(0, 7 - personal.length);
     const qs = [ROUND1[0], ...general];
