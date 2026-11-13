@@ -504,6 +504,33 @@ b{font-weight:600}
 @keyframes tpulse{to{transform:scale(1.12)}}
 .answer .head{position:sticky;top:-10px;z-index:3;background:#1f1f23;padding:8px 0 6px;margin-top:-8px}
 @media (max-width:640px){.answer .tbar{height:10px;border-radius:5px}.answer .sec{font-size:18px}.tbadge{top:12px;left:12px;font-size:22px}}
+
+/* ===== 手機：講者模式（誰講話誰佔滿畫面，其他人縮成右上角小視窗） ===== */
+@media (max-width:640px){
+  .tiles{display:block;position:relative}
+  .tiles .tile{position:absolute;inset:0;display:none}
+  .tiles .tile.main{display:flex}
+  .tiles .tile.thumb{display:flex;inset:auto;top:10px;right:10px;width:86px;height:116px;min-height:0;z-index:6;border-radius:8px;box-shadow:0 3px 12px #000c;border:1px solid #ffffff30}
+  .tiles .tile.thumb.speak{box-shadow:0 0 0 2px #7f85f5,0 3px 12px #000c}
+  .tile.thumb .nm{font-size:9px;left:3px;bottom:3px;padding:1px 4px;max-width:calc(100% - 6px)}
+  .tile.thumb .mic,.tile.thumb .net{display:none}
+  .tile.thumb .waiting .ava{width:40px!important;height:40px!important;font-size:15px!important}
+  .tile.thumb .fx{display:none}
+  .tile .cut-jensen{height:118%;bottom:-24%}
+  .tile.thumb .cut-jensen{height:150%;bottom:-58%}
+}
+@media (max-width:640px){.mt-toast{left:10px;transform:none;max-width:calc(100% - 120px);font-size:12px;animation:none}}
+/* 電腦版也用講者模式：主講者佔滿，其他人在右上角小視窗 */
+@media (min-width:641px){
+  .tiles{display:block;position:relative}
+  .tiles .tile{position:absolute;inset:0;display:none}
+  .tiles .tile.main{display:flex}
+  .tiles .tile.thumb{display:flex;inset:auto;top:12px;right:12px;width:200px;height:126px;min-height:0;z-index:6;border-radius:8px;box-shadow:0 3px 14px #000c;border:1px solid #ffffff30}
+  .tiles .tile.thumb.speak{box-shadow:0 0 0 2px #7f85f5,0 3px 14px #000c}
+  .tile.thumb .nm{font-size:10px;left:4px;bottom:4px;padding:2px 5px}
+  .tile.thumb .net,.tile.thumb .fx{display:none}
+  .tile.thumb .waiting .ava{width:48px!important;height:48px!important;font-size:18px!important}
+}
 </style>
 </head><body>
 <div id="chrome"></div>
@@ -2402,7 +2429,14 @@ function meeting(round) {
     else t.innerHTML = `<div class="bg photo" style="background-image:url(${IMG[p.bg]})"></div><img class="cut cut-${id}" src="${IMG[p.img]}" alt=""><div class="cam-fx"></div><span class="nm"><span class="mic">🎙</span>${p.name} · ${p.role}</span><span class="net">📶</span>`;
     tiles.insertBefore(t, $('#self', M));
     tiles.style.setProperty('--n', $$('.tile', tiles).length);
+    if (!opts.camOff || !$('.tile.main', tiles)) setMain(id);
     SND.join(); mtToast(L(`${p.name} 已加入會議`, `${p.name} joined the meeting`));
+  }
+  function setMain(id) {
+    const tiles = M && $('#tiles', M); if (!tiles) return;
+    const all = $$('.tile', tiles), main = $('#t_' + id, tiles) || all[all.length - 1]; if (!main) return;
+    all.forEach(t => { t.classList.toggle('main', t === main); t.classList.toggle('thumb', t !== main); });
+    tiles.style.setProperty('--n', all.length);
   }
   function mood(id, m) { const t = M && $('#t_' + id, M); if (!t || t.classList.contains('empty')) return; t.classList.remove('m-smile', 'm-frown', 'm-sad', 'm-soft', 'm-neutral'); t.classList.add('m-' + m); if (m === 'smile' || m === 'frown') { const c = $('.cut', t); c && (c.classList.remove('nod'), void c.offsetWidth, c.classList.add('nod')); } }
   function mtToast(t, ms = 2800) { if (!M) return; const d = document.createElement('div'); d.className = 'mt-toast'; d.innerHTML = t; M.appendChild(d); setTimeout(() => d.remove(), ms); }
@@ -2413,7 +2447,7 @@ function meeting(round) {
     const cap = $('#cap', M); const name = id === 'you' ? S.name : PEOPLE[id].name;
     if ($('#wb', M)) idle(' ');
     $$('.tile', M).forEach(t => t.classList.remove('speak', 'talking'));
-    const t = $('#t_' + id, M); if (t) t.classList.add('speak', 'talking');
+    const t = $('#t_' + id, M); if (t) { t.classList.add('speak', 'talking'); setMain(id); }
     $('.who', cap).textContent = name + L('：', ': '); const tx = $('.tx', cap); tx.textContent = '';
     if (id !== 'you') speak(text, id);
     fast = false; cap.onclick = () => fast = true;
@@ -2597,7 +2631,7 @@ function meeting(round) {
       if (patience <= 0) {
         await type('jensen', L('我們就到這裡吧。', "Let's stop here."));
         await sleep(1200);
-        const jt = $('#t_jensen', M); jt && jt.remove(); $('#tiles', M).style.setProperty('--n', 1); SND.leave(); mtToast(L('Jensen Huang 已離開會議', 'Jensen Huang left the meeting'));
+        const jt = $('#t_jensen', M); jt && jt.remove(); setMain('harvey'); SND.leave(); mtToast(L('Jensen Huang 已離開會議', 'Jensen Huang left the meeting'));
         await sleep(1200);
         await say('harvey', L('……呃，謝謝你今天的時間。我們會再通知你。', '…Uh, thank you for your time today. We\'ll be in touch.'));
       } else {
@@ -2667,7 +2701,7 @@ function meeting(round) {
     idle('……');
     MUSIC.stop();
     await sleep(1200);
-    const h = $('#t_harvey', M); if (h) { h.remove(); SND.leave(); mtToast(L('Harvey C. Jones 已離開會議（他說：你們兩個聊）', 'Harvey C. Jones left the meeting ("I\'ll let you two talk")')); }
+    const h = $('#t_harvey', M); if (h) { h.remove(); setMain('jensen'); SND.leave(); mtToast(L('Harvey C. Jones 已離開會議（他說：你們兩個聊）', 'Harvey C. Jones left the meeting ("I\'ll let you two talk")')); }
     $('#tiles', M).style.setProperty('--n', 1);
     await sleep(1800);
     for (const Ln of ENDING) {
