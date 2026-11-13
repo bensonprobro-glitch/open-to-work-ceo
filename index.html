@@ -492,6 +492,18 @@ b{font-weight:600}
 .camask .cb2{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px}
 .ghostbtn{border:1px solid #777;border-radius:6px;padding:10px 18px;color:#eee;font-weight:600}
 .ghostbtn:hover{background:#ffffff14}
+
+/* ===== 倒數計時：視訊畫面上方大徽章＋進度線（手機作答區滑動時仍看得到） ===== */
+.mt-stage{position:relative}
+.tline{position:absolute;left:0;right:0;top:0;height:6px;z-index:8;background:#ffffff14}
+.tline i{display:block;height:100%;background:#7f85f5;transform-origin:left;box-shadow:0 0 10px #7f85f5}
+.tline.hot i{background:#e74c3c;box-shadow:0 0 12px #e74c3c}
+.tbadge{position:absolute;top:16px;left:18px;z-index:9;background:#000000d0;border:2px solid #7f85f5;border-radius:999px;padding:5px 16px;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;color:#fff;box-shadow:0 4px 16px #0008;pointer-events:none}
+.tbadge b{display:inline-block;min-width:1.3em;text-align:center}
+.tbadge.hot{border-color:#e74c3c;color:#ff9a9a;animation:tpulse .5s ease-in-out infinite alternate}
+@keyframes tpulse{to{transform:scale(1.12)}}
+.answer .head{position:sticky;top:-10px;z-index:3;background:#1f1f23;padding:8px 0 6px;margin-top:-8px}
+@media (max-width:640px){.answer .tbar{height:10px;border-radius:5px}.answer .sec{font-size:18px}.tbadge{top:12px;left:12px;font-size:22px}}
 </style>
 </head><body>
 <div id="chrome"></div>
@@ -2362,7 +2374,7 @@ function meeting(round) {
     const t0 = Date.now();
     d.innerHTML = `<div class="mt-top"><span class="logo">C</span><span class="ttl">${title}</span><span class="clock" id="clk">00:00</span>${round === 1 ? `<span class="rec"><i></i>${L('錄製中', 'Recording')}</span>` : ''}
       <div class="sp"><button class="ib" id="bMus" title="Music">${MUSIC_ON ? '🎵' : '🔕'}</button><button class="ib" id="bChat">💬<span class="bdg hide" id="chatB">1</span></button><button class="ib mhide" id="bPpl">👥</button><button class="leave" id="bLeave">${L('離開', 'Leave')}</button></div></div>
-      <div class="mt-main"><div class="mt-stage"><div class="tiles" id="tiles"></div><div class="caption" id="cap"><span class="who"></span><span class="tx">　</span></div></div><div class="side hide" id="side"></div></div>
+      <div class="mt-main"><div class="mt-stage"><div class="tline hide" id="tline"><i></i></div><div class="tbadge hide" id="tbadge">⏱ <b>0</b></div><div class="tiles" id="tiles"></div><div class="caption" id="cap"><span class="who"></span><span class="tx">　</span></div></div><div class="side hide" id="side"></div></div>
       <div class="answer" id="ans"><div class="head"><span>${L('等待面試官……', 'Waiting for the interviewer…')}</span></div></div>
       <div class="ctrl"><button id="cMic" class="${MT.micOn ? '' : 'off'}">${MT.micOn ? '🎙' : '🔇'}</button><button id="cCam" class="${MT.camOn ? '' : 'off'}">${MT.camOn ? '📷' : '🚫'}</button><button>✋</button><button>😊</button><button class="peek" id="cPeek">📝 ${L('偷看小抄', 'Peek at notes')}</button></div>`;
     const clk = setInterval(() => { if (!d.isConnected) return clearInterval(clk); const s = Math.floor((Date.now() - t0) / 1000); $('#clk', d).textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }, 1000);
@@ -2433,16 +2445,27 @@ function meeting(round) {
   // ---- 計時器（共用） ----
   function timer(ans, time, onEnd) {
     const t0 = performance.now(); let lastSec = time, stop = false; MUSIC.tickLoud = true;
+    // 視訊畫面上方的大倒數（作答區往下滑也看得到）
+    const line = $('#tline', M), badge = $('#tbadge', M);
+    const show = on => { [line, badge].forEach(x => { if (!x) return; x.classList.toggle('hide', !on); x.classList.remove('hot'); }); };
+    show(true); if (badge) $('b', badge).textContent = time;
+    const end = () => { MUSIC.tickLoud = false; show(false); };
     const loop = () => {
-      if (stop || !ans.isConnected || run !== MT.run) { MUSIC.tickLoud = false; return; }
-      const left = time - (performance.now() - t0) / 1000;
-      const tb = $('#tb', ans); if (tb) tb.style.transform = `scaleX(${Math.max(0, left / time)})`;
-      const sec = Math.ceil(left); if (sec !== lastSec) { lastSec = sec; const se = $('#sec', ans); if (se) se.textContent = Math.max(0, sec); if (sec <= 5 && sec > 0) { SND.tick(); const b = $('.tbar', ans); b && b.classList.add('hot'); } }
-      if (left <= 0) { MUSIC.tickLoud = false; return onEnd(); }
+      if (stop || !ans.isConnected || run !== MT.run) { end(); return; }
+      const left = time - (performance.now() - t0) / 1000, frac = Math.max(0, left / time);
+      const tb = $('#tb', ans); if (tb) tb.style.transform = `scaleX(${frac})`;
+      if (line) $('i', line).style.transform = `scaleX(${frac})`;
+      const sec = Math.ceil(left);
+      if (sec !== lastSec) {
+        lastSec = sec; const se = $('#sec', ans); if (se) se.textContent = Math.max(0, sec);
+        if (badge) $('b', badge).textContent = Math.max(0, sec);
+        if (sec <= 5 && sec > 0) { SND.tick(); const b = $('.tbar', ans); b && b.classList.add('hot'); line && line.classList.add('hot'); badge && badge.classList.add('hot'); }
+      }
+      if (left <= 0) { end(); return onEnd(); }
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
-    return { stop() { stop = true; MUSIC.tickLoud = false; }, get sec() { return lastSec; } };
+    return { stop() { stop = true; end(); }, get sec() { return lastSec; } };
   }
   function ask(q, time, extraHead = '') {
     return new Promise(resolve => {
