@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="zh-Hant"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>NVIDIA CEO 遊戲後台</title>
+<style>
+:root{--bg:#f4f4f2;--surface:#fcfcfb;--line:#e4e3df;--text:#0b0b0b;--text2:#52514e;--muted:#8a8984;--s1:#2a78d6;--s1soft:#2a78d622;--good:#1a7f37;--bad:#c4314b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111110;--surface:#1a1a19;--line:#2e2e2c;--text:#f0efec;--text2:#c3c2b7;--muted:#8d8c86;--s1:#3987e5;--s1soft:#3987e533;--good:#3fb950;--bad:#f0607a}}
+:root[data-theme="dark"]{--bg:#111110;--surface:#1a1a19;--line:#2e2e2c;--text:#f0efec;--text2:#c3c2b7;--muted:#8d8c86;--s1:#3987e5;--s1soft:#3987e533;--good:#3fb950;--bad:#f0607a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+header h1{font-size:16px;margin:0;margin-right:auto}
+button,select{font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+button.on{background:var(--s1);border-color:var(--s1);color:#fff}
+main{max-width:1180px;margin:0 auto;padding:16px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+.kpi b{display:block;font-size:26px;font-variant-numeric:tabular-nums}
+.kpi span{color:var(--text2);font-size:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:12px;overflow:hidden}
+.card h2{font-size:15px;margin:0 0 4px}
+.card .sub{color:var(--muted);font-size:12px;margin-bottom:10px}
+.two{grid-template-columns:1fr 1fr}@media (max-width:820px){.two{grid-template-columns:1fr}}
+.row{display:grid;grid-template-columns:150px 1fr 110px;gap:10px;align-items:center;padding:4px 0;font-variant-numeric:tabular-nums}
+.row .lb{color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .v{text-align:right;color:var(--text)}
+.row .v small{color:var(--muted)}
+.bar{height:14px;background:transparent;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--s1);border-radius:0 4px 4px 0;min-width:2px}
+.row:hover .bar i{filter:brightness(1.15)}
+.drop{color:var(--bad);font-size:11px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--text2);font-weight:600;font-size:12px}
+td.num,th.num{text-align:right}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--s1soft)}
+.scroll{overflow-x:auto}
+.cols{display:flex;align-items:flex-end;gap:2px;height:120px;border-bottom:1px solid var(--line);padding-top:8px}
+.cols div{flex:1;background:var(--s1);border-radius:3px 3px 0 0;min-height:1px;position:relative}
+.cols div:hover{filter:brightness(1.15)}
+.axis{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:4px}
+.tip{position:fixed;pointer-events:none;background:var(--text);color:var(--bg);font-size:12px;padding:4px 8px;border-radius:5px;z-index:20;display:none}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0 8px;font-size:12px;color:var(--text2);margin:1px}
+.good{color:var(--good)}.bad{color:var(--bad)}
+.center{max-width:420px;margin:12vh auto;text-align:center}
+.center .btn{background:var(--s1);color:#fff;border:0;padding:10px 20px;font-size:15px}
+#modal{position:fixed;inset:0;background:#0008;display:none;z-index:30;align-items:center;justify-content:center;padding:16px}
+#modal .box{background:var(--surface);border-radius:10px;max-width:760px;width:100%;max-height:88vh;overflow:auto;padding:16px}
+.tl{border-left:2px solid var(--line);margin-left:8px;padding-left:14px}
+.tl div{position:relative;padding:3px 0}
+.tl div::before{content:"";position:absolute;left:-19px;top:10px;width:8px;height:8px;border-radius:50%;background:var(--s1)}
+.tl .t{color:var(--muted);font-variant-numeric:tabular-nums;display:inline-block;width:58px}
+.tl .ev{font-weight:600}
+.tl .p{color:var(--text2);font-size:12px}
+.note{color:var(--muted);font-size:12px;margin-top:20px}
+</style></head><body>
+<header><h1>🧥 NVIDIA CEO 遊戲後台</h1>
+  <span id="ranges"></span>
+  <button id="reload">↻ 重新整理</button>
+  <span id="who" style="color:var(--muted);font-size:12px"></span>
+</header>
+<main id="main"><div class="center">載入中…</div></main>
+<div id="modal"><div class="box" id="mbox"></div></div>
+<div class="tip" id="tip"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+// 公開的 Supabase 設定（anon key 本來就是公開的；只能新增匿名事件，讀不到資料）
+const SB = { url: 'https://ljhwhhrqidcarywunyfj.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqaHdoaHJxaWRjYXJ5d3VueWZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MTg4NTgsImV4cCI6MjEwODQ5NDg1OH0.GRRpBCofDRBgHywTmfh-9xOPIgOrjYUAOKPHpLq3OrM' };
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const DEMO = /[?&]demo/.test(location.search);
+const sb = DEMO ? null : supabase.createClient(SB.url, SB.key);
+let RANGE = 7, EVENTS = [];
+const RANGES = [[1, '今天'], [7, '7 天'], [30, '30 天'], [3650, '全部']];
+$('#ranges').innerHTML = RANGES.map(r => `<button data-r="${r[0]}" class="${r[0] === RANGE ? 'on' : ''}">${r[1]}</button>`).join(' ');
+$('#ranges').onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; RANGE = +b.dataset.r; document.querySelectorAll('[data-r]').forEach(x => x.classList.toggle('on', x === b)); load(); };
+$('#reload').onclick = () => load();
+
+const STEPS = [
+  ['visit', '進站', e => e.ev === 'visit'],
+  ['start', '建立檔案・開始', e => e.ev === 'start'],
+  ['job', '看職缺', e => e.ev === 'scr' && e.p.name === 'job'],
+  ['apply', '開始填履歷', e => e.ev === 'apply_open'],
+  ['resume', '送出履歷', e => e.ev === 'resume'],
+  ['resume_pass', '履歷通過', e => e.ev === 'resume' && e.p.pass],
+  ['r1', '進入第一面', e => e.ev === 'scr' && e.p.name === 'r1'],
+  ['r1_pass', '第一面通過', e => e.ev === 'r1' && e.p.pass],
+  ['final', '進入終面', e => e.ev === 'scr' && e.p.name === 'final'],
+  ['win', '通關（看到結局）', e => e.ev === 'win']
+];
+const SCR_NAMES = { title: '首頁', feed: '動態牆', job: '職缺頁', apply: '填履歷', ats: 'AI 篩選', mail_reject: '收到婉拒信', mail_pass: '履歷通過信', inmail: '獵頭私訊', prejoin: '進會議前', r1: '第一次面試', waiting: '等結果', r1_pass: '終面邀請信', r1_fail: '第一面落選信', final: '最終面試', ending: '結局', final_fail: '終面落選信', win: '登頂貼文' };
+
+async function auth() {
+  if (DEMO) { $('#who').textContent = '示範資料'; return true; }
+  const { data } = await sb.auth.getSession();
+  if (!data.session) {
+    $('#main').innerHTML = `<div class="center"><h2>後台登入</h2><p style="color:var(--text2)">用 Padloop 的管理員 Google 帳號登入。</p><button class="btn" id="login">用 Google 登入</button></div>`;
+    $('#login').onclick = () => sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
+    return false;
+  }
+  const { data: ok } = await sb.rpc('is_admin');
+  $('#who').innerHTML = `${esc(data.session.user.email)} · <a href="#" id="logout" style="color:inherit">登出</a>`;
+  $('#logout').onclick = async e => { e.preventDefault(); await sb.auth.signOut(); location.reload(); };
+  if (!ok) { $('#main').innerHTML = `<div class="center"><h2>沒有權限</h2><p>這個帳號不是管理員。</p></div>`; return false; }
+  return true;
+}
+async function fetchEvents() {
+  if (DEMO) return demoData();
+  const since = new Date(Date.now() - RANGE * 864e5); if (RANGE === 1) since.setHours(0, 0, 0, 0);
+  const out = []; let from = 0;
+  while (from < 60000) {
+    const { data, error } = await sb.from('nvceo_events').select('id,ts,vid,sid,ev,props').gte('ts', since.toISOString()).order('id').range(from, from + 999);
+    if (error) throw error;
+    out.push(...data); if (data.length < 1000) break; from += 1000;
+  }
+  return out;
+}
+async function load() {
+  if (!(await auth())) return;
+  $('#main').innerHTML = '<div class="center">載入中…</div>';
+  try { EVENTS = (await fetchEvents()).map(r => ({ id: r.id, ts: new Date(r.ts), vid: r.vid, sid: r.sid, ev: r.ev === 'screen' ? 'scr' : r.ev, p: r.props || {} })); }
+  catch (e) { $('#main').innerHTML = `<div class="center"><h2>讀取失敗</h2><p>${esc(e.message)}</p></div>`; return; }
+  render();
+}
+
+function channelOf(v) {
+  if (!v) return '（不明）';
+  if (v.src) return 's=' + v.src;
+  if (v.app) return v.app + ' 內建瀏覽器';
+  if (v.ref) { const h = v.ref.split('/')[0].replace(/^www\./, ''); if (/facebook|fb\./.test(h)) return 'Facebook'; if (/line\./.test(h)) return 'LINE'; if (/google\./.test(h)) return 'Google 搜尋'; if (/t\.co|twitter|x\.com/.test(h)) return 'X'; if (/threads/.test(h)) return 'Threads'; return h; }
+  return '直接開啟／複製連結';
+}
+function fmtDur(s) { s = Math.max(0, Math.round(s)); return s < 60 ? s + ' 秒' : Math.floor(s / 60) + ' 分 ' + (s % 60) + ' 秒'; }
+function pct(a, b) { return b ? Math.round(a / b * 100) + '%' : '—'; }
+
+function render() {
+  const E = EVENTS;
+  // 依分頁（sid）整理成「一次遊玩」
+  const ses = new Map();
+  E.forEach(e => { if (!ses.has(e.sid)) ses.set(e.sid, { sid: e.sid, vid: e.vid, ev: [] }); ses.get(e.sid).ev.push(e); });
+  const S = [...ses.values()].map(s => {
+    const v = s.ev.find(e => e.ev === 'visit'); const first = s.ev[0].ts, last = s.ev[s.ev.length - 1].ts;
+    let far = 0; STEPS.forEach((st, i) => { if (s.ev.some(st[2])) far = i; });
+    return { ...s, visit: v ? v.p : null, first, last, dur: (last - first) / 1000, far, ch: channelOf(v && v.p) };
+  }).sort((a, b) => b.first - a.first);
+  const vids = new Set(E.map(e => e.vid));
+  // 漏斗（以「人」=訪客 vid 計）
+  const funnel = STEPS.map(st => new Set(E.filter(st[2]).map(e => e.vid)).size);
+  const top = funnel[0] || 1;
+  const avgDur = S.length ? S.reduce((a, s) => a + s.dur, 0) / S.length : 0;
+  // 來源
+  const byCh = {}; S.forEach(s => { const c = byCh[s.ch] || (byCh[s.ch] = { n: 0, start: 0, resume: 0, win: 0 }); c.n++; if (s.far >= 1) c.start++; if (s.far >= 4) c.resume++; if (s.far >= 9) c.win++; });
+  const chRows = Object.entries(byCh).sort((a, b) => b[1].n - a[1].n);
+  const count = f => { const m = {}; S.forEach(s => { const k = f(s); if (k != null) m[k] = (m[k] || 0) + 1; }); return Object.entries(m).sort((a, b) => b[1] - a[1]); };
+  const dev = count(s => s.visit ? (s.visit.mobile ? '手機' : '電腦') + ' · ' + (s.visit.os || '') : null);
+  const lang = (() => { const m = {}; E.filter(e => e.ev === 'start').forEach(e => { const k = e.p.lang === 'zh' ? '繁體中文' : 'English'; m[k] = (m[k] || 0) + 1; }); return Object.entries(m).sort((a, b) => b[1] - a[1]); })();
+  // 每日訪客
+  const days = Math.min(RANGE, 30), daily = [];
+  for (let i = days - 1; i >= 0; i--) { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - i); const n = new Date(d); n.setDate(n.getDate() + 1); daily.push([d, new Set(E.filter(e => e.ev === 'visit' && e.ts >= d && e.ts < n).map(e => e.vid)).size]); }
+  const dmax = Math.max(1, ...daily.map(d => d[1]));
+  // 題目
+  const qs = {}; E.filter(e => e.ev === 'answer').forEach(e => { const k = (e.p.round === 2 ? '終面 · ' : '第一面 · ') + e.p.q; const o = qs[k] || (qs[k] = { n: 0, s: 0, good: 0, to: 0, pk: 0, ms: 0, msn: 0 }); o.n++; o.s += e.p.s; if (e.p.s >= 8) o.good++; if (e.p.timeout) o.to++; if (e.p.peek) o.pk++; if (e.p.ms) { o.ms += e.p.ms; o.msn++; } });
+  const qRows = Object.entries(qs).sort((a, b) => a[1].s / a[1].n - b[1].s / b[1].n);
+  // 履歷
+  const res = E.filter(e => e.ev === 'resume'); const resPass = res.filter(e => e.p.pass).length;
+  const expC = {}; res.forEach(e => (e.p.exp || []).forEach(x => expC[x] = (expC[x] || 0) + 1));
+  const expRows = Object.entries(expC).sort((a, b) => b[1] - a[1]);
+  const EXPN = { e_ceo: '執行長', e_coo: '營運長', e_cco: '法遵長', e_cto: '晶片新創 CTO', e_gov: '商務部副部長', e_board: '競爭對手董事', e_hedge: '放空 NVDA 基金經理', e_inventor: 'GPU 發明人（假）', e_crypto: '幣圈交易所', e_youtube: '皮衣 YouTuber', e_dennys: "Denny's 洗碗" };
+
+  const barRow = (lb, n, max, extra = '') => `<div class="row" data-tip="${esc(lb)}：${n}"><span class="lb" title="${esc(lb)}">${esc(lb)}</span><span class="bar"><i style="width:${n / Math.max(1, max) * 100}%"></i></span><span class="v">${n}${extra}</span></div>`;
+  $('#main').innerHTML = `
+  <div class="grid kpis">
+    <div class="kpi"><b>${vids.size}</b><span>訪客（不重複的人）</span></div>
+    <div class="kpi"><b>${S.length}</b><span>遊玩次數（分頁）</span></div>
+    <div class="kpi"><b>${pct(funnel[1], funnel[0])}</b><span>進站後開始玩</span></div>
+    <div class="kpi"><b>${res.length ? pct(resPass, res.length) : '—'}</b><span>履歷通過率</span></div>
+    <div class="kpi"><b>${funnel[9]}</b><span>通關人數</span></div>
+    <div class="kpi"><b>${fmtDur(avgDur)}</b><span>平均停留</span></div>
+  </div>
+  <div class="card"><h2>每一步還剩幾個人（漏斗）</h2><div class="sub">以「人」計算；紅字是跟上一步比掉了多少</div>
+    ${STEPS.map((st, i) => barRow(st[1], funnel[i], top, ` <small>${pct(funnel[i], top)}</small>${i && funnel[i - 1] ? `<div class="drop">−${pct(funnel[i - 1] - funnel[i], funnel[i - 1])}</div>` : ''}`)).join('')}
+  </div>
+  <div class="grid two">
+    <div class="card"><h2>從哪裡來</h2><div class="sub">網址加 <code>?s=群組名</code> 就能分辨是哪個群組點進來的</div>
+      <div class="scroll"><table><tr><th>來源</th><th class="num">次數</th><th class="num">開始玩</th><th class="num">送履歷</th><th class="num">通關</th></tr>
+      ${chRows.map(([k, c]) => `<tr><td>${esc(k)}</td><td class="num">${c.n}</td><td class="num">${pct(c.start, c.n)}</td><td class="num">${pct(c.resume, c.n)}</td><td class="num">${c.win}</td></tr>`).join('') || '<tr><td colspan=5>還沒有資料</td></tr>'}</table></div></div>
+    <div class="card"><h2>每日訪客</h2><div class="sub">最近 ${days} 天，不重複的人</div>
+      <div class="cols">${daily.map(d => `<div style="height:${d[1] / dmax * 100}%" data-tip="${d[0].getMonth() + 1}/${d[0].getDate()}：${d[1]} 人"></div>`).join('')}</div>
+      <div class="axis"><span>${daily[0][0].getMonth() + 1}/${daily[0][0].getDate()}</span><span>今天</span></div>
+      <h2 style="margin-top:16px">裝置</h2>${dev.slice(0, 6).map(d => barRow(d[0], d[1], dev[0][1])).join('') || '<div class="sub">還沒有資料</div>'}
+      <h2 style="margin-top:12px">語言</h2>${lang.map(d => barRow(d[0], d[1], lang[0][1])).join('') || '<div class="sub">還沒有資料</div>'}
+    </div>
+  </div>
+  <div class="card"><h2>題目難度</h2><div class="sub">從最難（平均分最低）排到最簡單；答對＝8 分以上</div>
+    <div class="scroll"><table><tr><th>題目</th><th class="num">作答</th><th class="num">平均分</th><th class="num">答對</th><th class="num">超時</th><th class="num">偷看小抄</th><th class="num">平均用時</th></tr>
+    ${qRows.map(([k, o]) => `<tr><td title="${esc(k)}">${esc(k.slice(0, 40))}</td><td class="num">${o.n}</td><td class="num ${o.s / o.n < 5 ? 'bad' : ''}">${(o.s / o.n).toFixed(1)}</td><td class="num">${pct(o.good, o.n)}</td><td class="num">${pct(o.to, o.n)}</td><td class="num">${pct(o.pk, o.n)}</td><td class="num">${o.msn ? (o.ms / o.msn / 1000).toFixed(1) + ' 秒' : '—'}</td></tr>`).join('') || '<tr><td colspan=7>還沒有資料</td></tr>'}</table></div></div>
+  <div class="card"><h2>大家選了哪些經歷</h2><div class="sub">送出的 ${res.length} 份履歷（每份 3 段）</div>
+    ${expRows.map(([k, n]) => barRow(EXPN[k] || k, n, expRows[0][1])).join('') || '<div class="sub">還沒有資料</div>'}</div>
+  <div class="card"><h2>最近的遊玩（點一列看完整路徑）</h2><div class="sub">最多顯示 200 筆</div>
+    <div class="scroll"><table><tr><th>時間</th><th>來源</th><th>裝置</th><th>走到哪</th><th class="num">停留</th><th class="num">回訪</th></tr>
+    ${S.slice(0, 200).map((s, i) => `<tr class="click" data-s="${i}"><td>${s.first.toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td><td>${esc(s.ch)}</td><td>${s.visit ? (s.visit.mobile ? '📱' : '💻') + ' ' + esc(s.visit.os || '') : ''}</td><td>${esc(STEPS[s.far][1])}</td><td class="num">${fmtDur(s.dur)}</td><td class="num">${s.visit && s.visit.returning ? '第 ' + (s.visit.returning + 1) + ' 次' : '新'}</td></tr>`).join('') || '<tr><td colspan=6>還沒有資料</td></tr>'}</table></div></div>
+  <div class="note">資料只有匿名 id，不含名字、職稱、照片、email。示範：在網址後面加 ?demo=1 看假資料。</div>`;
+  document.querySelectorAll('[data-s]').forEach(tr => tr.onclick = () => openSession(S[+tr.dataset.s]));
+}
+function describe(e) {
+  const p = e.p;
+  switch (e.ev) {
+    case 'visit': return `來源：${channelOf(p)}${p.ref ? '（' + esc(p.ref) + '）' : ''} · ${p.mobile ? '手機' : '電腦'} ${esc(p.os)} · ${p.w}×${p.h}${p.returning ? ' · 第 ' + (p.returning + 1) + ' 次來' : ''}`;
+    case 'scr': return `${SCR_NAMES[p.name] || p.name}${p.step != null ? '（第 ' + (p.step + 1) + ' 步）' : ''}${p.round ? '（第 ' + p.round + ' 輪）' : ''}`;
+    case 'start': return `建立檔案${p.photo ? '・有上傳頭像' : ''} · ${p.lang === 'zh' ? '中文' : '英文'}`;
+    case 'save': return `存小抄：${esc(p.id)}（共 ${p.n} 張）`;
+    case 'resume': return `${p.pass ? '<span class="good">通過</span>' : '<span class="bad">被婉拒</span>'} · 匹配 ${p.match} · 可信 ${p.cred} · 經歷：${(p.exp || []).map(esc).join('、')}`;
+    case 'answer': return `${p.round === 2 ? '終面' : '第一面'}：${esc(p.q)} → <b class="${p.s >= 8 ? 'good' : p.s <= 3 ? 'bad' : ''}">${p.s} 分</b>${p.timeout ? ' · 超時' : ''}${p.peek ? ' · 偷看小抄' : ''}${p.ms ? ' · ' + (p.ms / 1000).toFixed(1) + ' 秒' : ''}`;
+    case 'r1': return `第一面${p.pass ? '<span class="good">通過</span>' : '<span class="bad">沒過</span>'} · 平均 ${p.avg}`;
+    case 'final': return `終面${p.pass ? '<span class="good">通過</span>' : '<span class="bad">沒過</span>'} · 平均 ${p.avg} · 剩耐心 ${p.patience}`;
+    case 'camera': return p.ok ? '開啟真實鏡頭' : '鏡頭被擋';
+    case 'retry': return '重試：' + esc(p.what);
+    case 'hidden': return `切到別的 App／分頁（在「${SCR_NAMES[p.scr] || p.scr}」）`;
+    case 'leave': return `離開網站（在「${SCR_NAMES[p.scr] || p.scr}」）`;
+    case 'win': return '🏆 通關';
+    default: return esc(JSON.stringify(p).slice(0, 120));
+  }
+}
+function openSession(s) {
+  const t0 = s.ev[0].ts;
+  $('#mbox').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">一次遊玩的完整路徑</h2><button id="mx">✕</button></div>
+    <div class="sub" style="margin:6px 0 12px">${s.first.toLocaleString('zh-TW')} · ${esc(s.ch)} · 停留 ${fmtDur(s.dur)} · 走到「${esc(STEPS[s.far][1])}」</div>
+    <div class="tl">${s.ev.map(e => `<div><span class="t">+${fmtDur((e.ts - t0) / 1000).replace(' 分 ', ':').replace(' 秒', 's')}</span><span class="ev">${esc(e.ev === 'scr' ? '畫面' : e.ev)}</span> <span class="p">${describe(e)}</span></div>`).join('')}</div>`;
+  $('#modal').style.display = 'flex'; $('#mx').onclick = () => $('#modal').style.display = 'none';
+}
+$('#modal').onclick = e => { if (e.target.id === 'modal') e.target.style.display = 'none'; };
+// 滑過長條顯示數字
+document.addEventListener('mousemove', e => { const t = e.target.closest('[data-tip]'), tip = $('#tip'); if (!t) { tip.style.display = 'none'; return; } tip.textContent = t.dataset.tip; tip.style.display = 'block'; tip.style.left = e.clientX + 12 + 'px'; tip.style.top = e.clientY + 12 + 'px'; });
+
+function demoData() {
+  const out = []; let id = 1; const now = Date.now();
+  const chans = [{ src: 'nvidia群' }, { app: 'LINE' }, { app: 'LINE' }, { ref: 'l.facebook.com/' }, {}, { app: 'Instagram' }, { src: '工程師群' }];
+  for (let i = 0; i < 60; i++) {
+    const vid = 'v' + (i % 45) + 'xxxxxxx', sid = 's' + i + 'xxxxxxx'; let t = now - Math.random() * 6 * 864e5;
+    const add = (ev, p) => { out.push({ id: id++, ts: new Date(t).toISOString(), vid, sid, ev, props: p }); t += 4000 + Math.random() * 30000; };
+    const ch = chans[i % chans.length], mob = Math.random() < .7;
+    add('visit', { ...ch, mobile: mob, os: mob ? (Math.random() < .6 ? 'iOS' : 'Android') : 'Mac', w: mob ? 390 : 1440, h: mob ? 760 : 900, returning: i > 45 ? 1 : 0 });
+    add('screen', { name: 'title' }); if (Math.random() < .25) { add('leave', { scr: 'title' }); continue; }
+    const lang = Math.random() < .7 ? 'zh' : 'en';
+    add('start', { lang, photo: Math.random() < .4 }); add('screen', { name: 'feed' }); add('save', { id: 'official', n: 1 });
+    if (Math.random() < .2) { add('leave', { scr: 'feed' }); continue; }
+    add('screen', { name: 'job' }); add('apply_open', {}); [0, 1, 2, 3, 4].forEach(k => add('screen', { name: 'apply', step: k }));
+    const pass = Math.random() < .6; add('resume', { pass, match: pass ? 82 : 55, cred: pass ? 90 : 40, exp: ['e_ceo', pass ? 'e_coo' : 'e_inventor', 'e_dennys'] });
+    if (!pass) { add('screen', { name: 'mail_reject' }); add('leave', { scr: 'mail_reject' }); continue; }
+    add('screen', { name: 'r1' });
+    ['why_you', 'revenue', 'earnings_call', 'e_ceo', 'org', 'china', 'moat', 'family'].forEach(q => add('answer', { round: 1, q, s: [10, 4, 2, 10, 6][Math.random() * 5 | 0], timeout: Math.random() < .1, peek: Math.random() < .15, ms: 4000 + Math.random() * 15000 }));
+    const r1 = Math.random() < .5; add('r1', { pass: r1, avg: r1 ? 7.8 : 5.1 }); if (!r1) { add('screen', { name: 'r1_fail' }); continue; }
+    add('screen', { name: 'final' }); ['30_days', 'speed_of_light', 'whiteboard_order'].forEach(q => add('answer', { round: 2, q, s: [10, 2, 6][Math.random() * 3 | 0], ms: 6000 + Math.random() * 8000 }));
+    if (Math.random() < .4) { add('final', { pass: true, avg: 8.6, patience: 2 }); add('screen', { name: 'ending' }); add('win', {}); } else add('final', { pass: false, avg: 6, patience: 0 });
+  }
+  return out.sort((a, b) => a.id - b.id);
+}
+load();
+</script></body></html>
