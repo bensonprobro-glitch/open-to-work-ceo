@@ -531,6 +531,37 @@ b{font-weight:600}
   .tile.thumb .net,.tile.thumb .fx{display:none}
   .tile.thumb .waiting .ava{width:48px!important;height:48px!important;font-size:18px!important}
 }
+
+/* ===== 動態牆 → 職缺的引導 ===== */
+.notebar{flex-wrap:nowrap}
+.nb-go{margin-left:auto;flex:none;background:#0a66c2;color:#fff;border-radius:16px;padding:6px 14px;font-weight:700;font-size:13px;white-space:nowrap;transition:background .15s}
+.nb-go:hover{background:#004182}
+.nb-go.ready{background:#057642;animation:nbglow 1.8s ease-in-out infinite}
+@keyframes nbglow{0%,100%{box-shadow:0 0 0 0 #05764266}50%{box-shadow:0 0 0 7px #05764200}}
+@media (max-width:560px){.nb-hint{display:none}}
+.jobhero{padding:14px 16px 12px;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 0 0 1px #b6d4f2,0 2px 10px #0a66c214;background:linear-gradient(180deg,#f3f8fd 0,#fff 60%)}
+.jobhero::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(#76b900,#0a66c2)}
+.jobhero:hover{box-shadow:0 0 0 2px #0a66c2,0 4px 16px #0a66c222}
+.jh-lb{font-size:12px;color:#555;display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.jh-lb b{color:#057642}
+.jh-dot{width:8px;height:8px;border-radius:50%;background:#057642;box-shadow:0 0 0 3px #05764222;animation:nbglow 1.8s infinite}
+.jh-row{display:flex;align-items:center;gap:12px}
+.jh-row .ava{width:64px;height:64px}
+.jh-tx{flex:1;min-width:0}
+.jh-tx b{font-size:17px;color:#0a66c2;display:block}
+.jh-tx div{font-size:13px;color:#333}
+.jh-meta{font-size:12px!important;color:#666!important;margin-top:2px}.jh-meta .g{color:#057642;font-weight:600}
+.jh-btn{flex:none;padding:8px 18px}
+.jh-tip{margin-top:10px;padding-top:9px;border-top:1px solid #e6eef6;font-size:12.5px;color:#555}
+@media (max-width:560px){.jh-row{flex-wrap:wrap}.jh-btn{width:100%;margin-top:4px}}
+.nudge{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:80;background:#fff;border-radius:14px;box-shadow:0 10px 40px #0003,0 0 0 1px #e0dfdc;padding:12px 12px 12px 16px;display:flex;align-items:center;gap:12px;width:min(520px,calc(100vw - 24px));animation:ngup .45s cubic-bezier(.2,1.3,.4,1)}
+@keyframes ngup{from{transform:translate(-50%,40px);opacity:0}}
+.ng-ic{font-size:24px}
+.ng-tx{flex:1;min-width:0;display:flex;flex-direction:column;font-size:13px;color:#555}
+.ng-tx b{font-size:15px;color:#111}
+.nudge .btn{white-space:nowrap}
+.ng-x{color:#999;font-size:14px;padding:4px}
+.notebar>span:first-child{white-space:nowrap}
 </style>
 </head><body>
 <div id="chrome"></div>
@@ -2009,7 +2040,7 @@ function lnNav(on) {
   <button class="ln-it"><span class="ico">${youAva(22)}</span><span class="lb">${L('我', 'Me')} ▾</span></button></div><div class="ln-prem">${L('免費試用 Premium', 'Try Premium for free')}</div></div></div>`;
 }
 function bindNav() {
-  $$('[data-nav]').forEach(b => b.onclick = () => { SND.click(); const k = b.dataset.nav; if (k === 'feed') scFeed(); else if (k === 'jobs') scJob(); else toast(L('（這個頁面在遊戲裡沒有內容 🙂）', '(Nothing on this page in the game 🙂)')); });
+  $$('[data-nav]').forEach(b => b.onclick = () => { SND.click(); const k = b.dataset.nav; if (k === 'feed') scFeed(); else if (k === 'jobs') { if (CUR === 'feed') track('cta_job', { where: 'nav', notes: S.saved.length }); scJob(); } else toast(L('（這個頁面在遊戲裡沒有內容 🙂）', '(Nothing on this page in the game 🙂)')); });
 }
 function modal(title, body, btns) {
   const d = document.createElement('div'); d.className = 'modal-bg';
@@ -2083,7 +2114,7 @@ function postHTML(p) {
   <div class="acts"><button data-like="${p.id}" class="${liked ? 'liked' : ''}">👍 ${L('讚', 'Like')}</button><button>💬 ${L('留言', 'Comment')}</button><button>🔁 ${L('轉發', 'Repost')}</button><button data-save="${p.id}" class="${saved ? 'saved' : ''}">${saved ? L('✅ 已存小抄', '✅ Saved to notes') : L('🔖 存成小抄', '🔖 Save to notes')}</button></div></div>`;
 }
 function noteBar() {
-  return `<div class="notebar"><span>📝 ${L('面試小抄', 'Interview notes')}</span><span class="pips">${Array.from({ length: NOTE_MAX }, (_, i) => `<i class="${i < S.saved.length ? 'on' : ''}"></i>`).join('')}</span><span class="muted small">${S.saved.length}/${NOTE_MAX}　${L('面試時可以偷看，但會被發現', 'You can peek during interviews — but they will notice')}</span></div>`;
+  return `<div class="notebar"><span>📝 ${L('面試小抄', 'Interview notes')}</span><span class="pips">${Array.from({ length: NOTE_MAX }, (_, i) => `<i class="${i < S.saved.length ? 'on' : ''}"></i>`).join('')}</span><span class="muted small">${S.saved.length}/${NOTE_MAX}<span class="nb-hint">　${L('面試時可以偷看，但會被發現', 'You can peek during interviews — but they will notice')}</span></span><button class="nb-go ${S.saved.length >= 3 ? 'ready' : ''}" data-job="notebar">${L('CEO 職缺', 'CEO job')} →</button></div>`;
 }
 function scFeed() {
   scrView('feed');
@@ -2095,20 +2126,26 @@ function scFeed() {
     <div class="row"><span>${L('個人檔案瀏覽者', 'Profile viewers')}</span><b>1,287</b></div><div class="row"><span>${L('貼文曝光次數', 'Post impressions')}</span><b>23</b></div></div>
     <div class="card rcard small muted">${L('最近使用', 'Recent')}<br><br># ${L('半導體', 'semiconductors')}<br># ${L('公司治理', 'governance')}<br># ${L('AI 基礎設施', 'AI infrastructure')}</div></div>
   <div class="ln-mid">${noteBar()}
+    <div class="card jobhero" data-job="topcard">
+      <div class="jh-lb"><span class="jh-dot"></span>${L('最符合你的職缺', 'Top job pick for you')} · <b>${L('符合 4 項條件', '4 of 10 qualifications match')}</b></div>
+      <div class="jh-row">${nv(64, 20)}<div class="jh-tx"><b>Chief Executive Officer</b><div>NVIDIA · Santa Clara, CA (${L('現場辦公', 'On-site')})</div><div class="jh-meta"><span class="g">● ${L('積極招募中', 'Actively recruiting')}</span> · ${L('超過 10,000 位應徵者', 'Over 10,000 applicants')}</div></div><button class="btn pri jh-btn">${L('查看職缺', 'View job')}</button></div>
+      <div class="jh-tip">💡 ${L('建議：先往下讀幾則新聞，按「存成小抄」——面試時用得到。準備好就去應徵。', 'Tip: read a few posts below and tap "Save to notes" — you\'ll need them in the interview. Then apply.')}</div>
+    </div>
     <div class="card startpost">${youAva(48)}<div class="fake">${L('發佈貼文', 'Start a post')}</div></div>
     <div class="small muted" style="margin:8px 4px;display:flex;align-items:center;gap:8px"><hr style="flex:1;border:0;border-top:1px solid #ccc">${L('排序方式：', 'Sort by:')} <b>${L('熱門', 'Top')} ▾</b></div>
     ${order.map(id => postHTML(POSTS.find(p => p.id === id))).join('')}
-    <div class="card rcard" style="text-align:center"><b>${L('你已經看完所有新動態了 🎉', "You're all caught up 🎉")}</b><br><button class="btn pri" style="margin-top:10px" data-job>${L('查看 NVIDIA 執行長職缺', 'View the NVIDIA CEO job')}</button></div>
+    <div class="card rcard" style="text-align:center"><b>${L('你已經看完所有新動態了 🎉', "You're all caught up 🎉")}</b><br><button class="btn pri" style="margin-top:10px" data-job="end">${L('查看 NVIDIA 執行長職缺', 'View the NVIDIA CEO job')}</button></div>
   </div>
   <div class="ln-right"><div class="card rcard"><h3>${L('為你推薦的職缺', 'Jobs recommended for you')}</h3>
-    <div class="jobrec pulse" data-job style="border:0">${nv(48)}<div><b>Chief Executive Officer</b><div>NVIDIA</div><div class="meta">Santa Clara, CA (${L('現場辦公', 'On-site')})</div><div class="meta"><span class="g">● ${L('積極招募中', 'Actively recruiting')}</span> · ${L('2 小時前', '2h ago')}</div></div></div>
+    <div class="jobrec pulse" data-job="rail" style="border:0">${nv(48)}<div><b>Chief Executive Officer</b><div>NVIDIA</div><div class="meta">Santa Clara, CA (${L('現場辦公', 'On-site')})</div><div class="meta"><span class="g">● ${L('積極招募中', 'Actively recruiting')}</span> · ${L('2 小時前', '2h ago')}</div></div></div>
     <div class="jobrec">${ava('A M', '#e74c3c', 48)}<div><b>Interim CFO</b><div>${L('某 AI 新創', 'An AI startup')}</div><div class="meta">${L('遠端 · 3 天前', 'Remote · 3d ago')}</div></div></div></div>
     <div class="card rcard news"><h3>${L('LinkedOn 新聞', 'LinkedOn News')}</h3><div class="small muted" style="margin:-4px 0 10px">${L('熱門話題', 'Top stories')}・${NEWS_DATE}</div><ul>${TRENDING.map(t => `<li><b>・${t[0]}</b><span>${t[1]}</span></li>`).join('')}</ul></div>
     <div class="disc">LinkedOn Corporation © 2026 (${L('虛構', 'fictional')})</div></div>
   </div>`;
   bindNav();
-  $$('[data-job]').forEach(b => b.onclick = () => { SND.click(); scJob(); });
   app.onclick = e => {
+    const jb = e.target.closest('[data-job]');
+    if (jb) { SND.click(); track('cta_job', { where: jb.dataset.job || 'other', notes: S.saved.length }); const n = $('.nudge'); n && n.remove(); scJob(); return; }
     const sv = e.target.closest('[data-save]'), lk = e.target.closest('[data-like]');
     if (lk) { S.liked[lk.dataset.like] = !S.liked[lk.dataset.like]; lk.classList.toggle('liked'); SND.click(); }
     if (sv) {
@@ -2118,6 +2155,12 @@ function scFeed() {
       else { S.saved.push(id); sv.classList.add('saved'); sv.innerHTML = L('✅ 已存小抄', '✅ Saved to notes'); SND.ping(); }
       $('.notebar').outerHTML = noteBar();
       track('save', { id, n: S.saved.length });
+      if (S.saved.length === NOTE_MAX && !$('.nudge')) {
+        const d = document.createElement('div'); d.className = 'nudge';
+        d.innerHTML = `<span class="ng-ic">✅</span><div class="ng-tx"><b>${L('小抄準備好了！', 'Your notes are ready!')}</b><span>${L('下一步：應徵 NVIDIA 執行長', 'Next: apply to be NVIDIA CEO')}</span></div><button class="btn pri" data-job="nudge">${L('前往職缺', 'Go to job')} →</button><button class="ng-x" aria-label="close">✕</button>`;
+        app.appendChild(d); SND.ping();
+        $('.ng-x', d).onclick = ev => { ev.stopPropagation(); d.remove(); };
+      }
     }
   };
 }

@@ -92,6 +92,7 @@ const STEPS = [
   ['final', '進入終面', e => e.ev === 'scr' && e.p.name === 'final'],
   ['win', '通關（看到結局）', e => e.ev === 'win']
 ];
+const CTA_NAMES = { topcard: '動態牆最上方精選卡', notebar: '小抄列的按鈕', nudge: '存滿 5 張的彈出提示', rail: '右側推薦職缺', end: '動態牆最底下', nav: '上方「職缺」分頁' };
 const SCR_NAMES = { title: '首頁', feed: '動態牆', job: '職缺頁', apply: '填履歷', ats: 'AI 篩選', mail_reject: '收到婉拒信', mail_pass: '履歷通過信', inmail: '獵頭私訊', prejoin: '進會議前', r1: '第一次面試', waiting: '等結果', r1_pass: '終面邀請信', r1_fail: '第一面落選信', final: '最終面試', ending: '結局', final_fail: '終面落選信', win: '登頂貼文' };
 
 async function auth() {
@@ -164,6 +165,8 @@ function render() {
   const dmax = Math.max(1, ...daily.map(d => d[1]));
   // 題目
   const qs = {}; E.filter(e => e.ev === 'answer').forEach(e => { const k = (e.p.round === 2 ? '終面 · ' : '第一面 · ') + e.p.q; const o = qs[k] || (qs[k] = { n: 0, s: 0, good: 0, to: 0, pk: 0, ms: 0, msn: 0 }); o.n++; o.s += e.p.s; if (e.p.s >= 8) o.good++; if (e.p.timeout) o.to++; if (e.p.peek) o.pk++; if (e.p.ms) { o.ms += e.p.ms; o.msn++; } });
+  const ctaC = {}; E.filter(e => e.ev === 'cta_job').forEach(e => { const k = CTA_NAMES[e.p.where] || e.p.where; ctaC[k] = (ctaC[k] || 0) + 1; });
+  const ctaRows = Object.entries(ctaC).sort((a, b) => b[1] - a[1]);
   const qRows = Object.entries(qs).sort((a, b) => a[1].s / a[1].n - b[1].s / b[1].n);
   // 履歷
   const res = E.filter(e => e.ev === 'resume'); const resPass = res.filter(e => e.p.pass).length;
@@ -195,6 +198,8 @@ function render() {
       <h2 style="margin-top:12px">語言</h2>${lang.map(d => barRow(d[0], d[1], lang[0][1])).join('') || '<div class="sub">還沒有資料</div>'}
     </div>
   </div>
+  <div class="card"><h2>從哪個入口點進職缺</h2><div class="sub">動態牆上的引導，哪一個最多人點</div>
+    ${ctaRows.map(([k, n]) => barRow(k, n, ctaRows[0][1])).join('') || '<div class="sub">還沒有資料</div>'}</div>
   <div class="card"><h2>題目難度</h2><div class="sub">從最難（平均分最低）排到最簡單；答對＝8 分以上</div>
     <div class="scroll"><table><tr><th>題目</th><th class="num">作答</th><th class="num">平均分</th><th class="num">答對</th><th class="num">超時</th><th class="num">偷看小抄</th><th class="num">平均用時</th></tr>
     ${qRows.map(([k, o]) => `<tr><td title="${esc(k)}">${esc(k.slice(0, 40))}</td><td class="num">${o.n}</td><td class="num ${o.s / o.n < 5 ? 'bad' : ''}">${(o.s / o.n).toFixed(1)}</td><td class="num">${pct(o.good, o.n)}</td><td class="num">${pct(o.to, o.n)}</td><td class="num">${pct(o.pk, o.n)}</td><td class="num">${o.msn ? (o.ms / o.msn / 1000).toFixed(1) + ' 秒' : '—'}</td></tr>`).join('') || '<tr><td colspan=7>還沒有資料</td></tr>'}</table></div></div>
@@ -219,6 +224,7 @@ function describe(e) {
     case 'final': return `終面${p.pass ? '<span class="good">通過</span>' : '<span class="bad">沒過</span>'} · 平均 ${p.avg} · 剩耐心 ${p.patience}`;
     case 'camera': return p.ok ? '開啟真實鏡頭' : '鏡頭被擋';
     case 'retry': return '重試：' + esc(p.what);
+    case 'cta_job': return `點進職缺（入口：${esc(CTA_NAMES[p.where] || p.where)}，已存 ${p.notes} 張小抄）`;
     case 'hidden': return `切到別的 App／分頁（在「${SCR_NAMES[p.scr] || p.scr}」）`;
     case 'leave': return `離開網站（在「${SCR_NAMES[p.scr] || p.scr}」）`;
     case 'win': return '🏆 通關';
@@ -248,7 +254,7 @@ function demoData() {
     const lang = Math.random() < .7 ? 'zh' : 'en';
     add('start', { lang, photo: Math.random() < .4 }); add('screen', { name: 'feed' }); add('save', { id: 'official', n: 1 });
     if (Math.random() < .2) { add('leave', { scr: 'feed' }); continue; }
-    add('screen', { name: 'job' }); add('apply_open', {}); [0, 1, 2, 3, 4].forEach(k => add('screen', { name: 'apply', step: k }));
+    add('cta_job', { where: ['topcard', 'notebar', 'nudge', 'rail', 'nav'][i % 5], notes: 3 }); add('screen', { name: 'job' }); add('apply_open', {}); [0, 1, 2, 3, 4].forEach(k => add('screen', { name: 'apply', step: k }));
     const pass = Math.random() < .6; add('resume', { pass, match: pass ? 82 : 55, cred: pass ? 90 : 40, exp: ['e_ceo', pass ? 'e_coo' : 'e_inventor', 'e_dennys'] });
     if (!pass) { add('screen', { name: 'mail_reject' }); add('leave', { scr: 'mail_reject' }); continue; }
     add('screen', { name: 'r1' });
