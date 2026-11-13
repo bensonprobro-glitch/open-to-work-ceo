@@ -803,166 +803,10 @@ const DISCLOSURES = [
 
 // ---------- 第一次面試：獵頭＋董事長 ----------
 // s：答題品質 0-10；fx：四方觀感 b=董事會 w=華爾街 e=工程師 d=華府
-const ROUND1 = [
-  { who: 'kress', fixed: true, q: '我們先暖身。用一句話告訴我們：為什麼是你？', opts: [
-    ['我會延續 Jensen 打下的願景，同時補上公司最缺的治理、法遵與接班機制。', 10, { b: 10, w: 4, e: 4, d: 4 }],
-    ['我是 Jensen 的頭號粉絲，連皮衣都買好了。', 2, { b: -10, e: -4 }],
-    ['我可以讓股價一年內翻倍。', 3, { w: 4, b: -6, e: -6 }],
-    ['因為我從來沒有任何醜聞。', 5, { b: 3, d: 3, e: -5 }]
-  ], tip: '董事會在找「讓公司不再只靠一個人」的人。' },
-  { who: 'kress', q: '考考基本功：NVIDIA FY2026（2026 年 1 月結束）全年營收大約多少？', opts: [
-    ['約 2,159 億美元', 10, { w: 8 }], ['約 1,305 億美元', 3, { w: -3 }], ['約 609 億美元', 0, { w: -8 }], ['約 4,000 億美元', 0, { w: -8 }]
-  ], tip: '1,305 億是 FY2025，609 億是 FY2024。', clue: 'numbers' },
-  { who: 'kress', q: '財報 11/17 就要公布，我這個臨時 CEO 才上任 5 天。如果你已經是 CEO，這場法說會怎麼開？', opts: [
-    ['照常公布：董事長開場說明交接，由臨時 CEO 主講，重申財測並開放提問。', 10, { b: 8, w: 10 }],
-    ['延後財報，等新 CEO 就任再說。', 1, { w: -15, b: -6 }],
-    ['開場宣布一筆大型併購，轉移焦點。', 2, { w: -5, b: -10, d: -5 }],
-    ['完全不提交接，只講數字。', 5, { w: 3, b: -3, e: -3 }]
-  ], tip: '危機時最重要的是「照常運作＋透明」。' },
-  { who: 'kress', q: '你知道 Jensen 有大約幾位直屬主管嗎？公司有沒有 COO 和專職法遵長？', opts: [
-    ['約 60 位；沒有 COO；沒有專職法遵長', 10, { b: 8 }],
-    ['約 12 位；有 COO；有法遵長', 0, { b: -8 }],
-    ['約 60 位；有 COO；沒有法遵長', 4, { b: -2 }],
-    ['約 200 位；沒有 COO；有法遵長', 1, { b: -6 }]
-  ], clue: 'gov' },
-  { who: 'kress', q: '那你會怎麼改組織？', opts: [
-    ['保留扁平與 T5T 文化，但設 COO 與首任法遵長，建立正式接班梯隊。', 10, { b: 10, e: 3, d: 5 }],
-    ['全面導入層級制，每位 VP 底下設 3 層主管。', 3, { e: -12, b: 3 }],
-    ['一切照舊，扁平就是 NVIDIA 的靈魂。', 3, { b: -10, e: 8 }],
-    ['先請顧問做 6 個月組織診斷再決定。', 4, { w: -3, e: -5 }]
-  ], tip: '扁平是優勢，「只靠一個人」是風險——兩個都要顧。' },
-  { who: 'kress', q: 'H200 在附條件下獲准賣到中國，同時又有報導指向出口管道和國安疑慮。你的中國策略？', opts: [
-    ['嚴格合規：獨立出口管制委員會、最終用戶稽核、可疑客戶先停出貨，主動向國會簡報。', 10, { d: 12, b: 6, w: -3 }],
-    ['全面撤出中國，一顆都不賣。', 5, { d: 5, w: -10, e: -3 }],
-    ['能賣多少賣多少，合規交給法務。', 1, { d: -15, b: -10, w: 5 }],
-    ['把中國業務轉給新加坡子公司處理。', 0, { d: -15, b: -10 }]
-  ], clue: 'dc' },
-  { who: 'kress', q: '投資人很擔心：OpenAI 資料中心 1,050 億美元擔保、neocloud 360 億美元表外擔保。法說會上被問到，你怎麼答？', opts: [
-    ['完整揭露曝險與壓力測試，設定擔保總額上限，並說明對生態系的策略價值。', 10, { w: 12, b: 6 }],
-    ['「這些是策略投資，不便說明。」', 2, { w: -12, b: -4 }],
-    ['宣布所有擔保立即解除。', 3, { w: -5, e: -5, b: -3 }],
-    ['「需求超強，客戶不可能違約。」', 4, { w: -4, b: -3 }]
-  ], clue: 'money' },
-  { who: 'kress', q: '總部招牌前有人放花，很多員工哭了。你上任第一天，全員大會的第一句話是？', opts: [
-    ['「謝謝 Jensen 33 年。使命沒有變，路線圖也沒有變。今天，我先聽你們說。」', 10, { e: 12, b: 3 }],
-    ['「新時代開始了，過去的事不要再提。」', 2, { e: -12 }],
-    ['「我知道大家擔心股票，RSU 不會變。」', 5, { e: 3, w: 2 }],
-    ['「Jensen 犯的錯，我們會徹底清算。」', 1, { e: -15, d: 3 }]
-  ], clue: 'eng' },
-  { who: 'kress', q: '總統在 Truth Social 說庫克才是最佳人選。記者在 CNBC 門口堵你，你怎麼回？', opts: [
-    ['「Tim Cook 是傳奇。人選由董事會依程序決定，我專注在客戶和員工。」', 10, { d: 6, b: 8 }],
-    ['「總統不懂半導體。」', 2, { d: -15 }],
-    ['「那請庫克來啊。」', 1, { b: -10, d: -5 }],
-    ['「我已經跟總統通過電話，他支持我。」', 2, { b: -12, d: -5 }]
-  ], tip: '不選邊、不越過董事會。' },
-  { who: 'kress', q: '確認一下事實：現在誰是臨時執行長？誰是公司史上第一位董事會主席？（對，這題有點考你有沒有在看新聞。）', opts: [
-    ['Colette Kress／Harvey C. Jones', 10, { b: 8 }],
-    ['Ian Buck／Stephen Neal', 0, { b: -8 }],
-    ['Colette Kress／Stephen Neal', 4, { b: -3 }],
-    ['Bill Dally／Harvey C. Jones', 3, { b: -4 }]
-  ], tip: '問你這題的人，就是臨時執行長本人。', clue: 'official' },
-  { who: 'kress', q: 'Google TPU、AWS Trainium、Broadcom 客製 ASIC 都在搶單。你的護城河是什麼？', opts: [
-    ['CUDA 軟體生態＋NVLink 與網通＋整座 AI 工廠的系統級整合，每年一代。', 10, { e: 8, w: 5 }],
-    ['降價打價格戰。', 2, { w: -10, e: -3 }],
-    ['開放 NVLink 給客製晶片，讓對手也接進我們的系統。', 7, { w: 3, e: 3 }],
-    ['我們市佔 90%，不用擔心。', 1, { e: -5, w: -5 }]
-  ] },
-  { who: 'kress', q: '約 129 億美元收購 Hugging Face 正在司法部審查，開源社群也很緊張。你怎麼處理？', opts: [
-    ['承諾平台對所有硬體中立、開源治理獨立，配合審查、必要時提出補救措施。', 10, { d: 8, e: 5, b: 5 }],
-    ['直接撤回交易。', 4, { w: -5, e: -3 }],
-    ['加速交割，先斬後奏。', 0, { d: -15, b: -10 }],
-    ['讓 Hugging Face 只支援 NVIDIA GPU。', 1, { d: -12, e: -8 }]
-  ], clue: 'dc' },
-  { who: 'kress', q: '說一個你失敗的經驗。', opts: [
-    ['講具體情境→我哪個決策錯了→付出什麼代價→之後怎麼改。', 10, { b: 6, e: 6 }],
-    ['「我最大的缺點是太認真。」', 1, { b: -8, e: -3 }],
-    ['「我沒有失敗過。」', 0, { b: -10, e: -8 }],
-    ['「那次其實是團隊的問題。」', 0, { e: -15, b: -5 }]
-  ] },
-  { who: 'kress', q: 'Jensen 的兩名子女與女婿都在公司任職。你怎麼處理？', opts: [
-    ['尊重專業，但移交獨立審查：薪酬升遷由董事會委員會審核、確認沒有不當匯報線、公開揭露。', 10, { b: 10, e: 3 }],
-    ['全部請走，一刀兩斷。', 3, { e: -8, b: -3 }],
-    ['升他們當 SVP，穩住創辦人家族。', 0, { b: -15, e: -10 }],
-    ['不處理，那是家務事。', 3, { b: -8 }]
-  ], clue: 'cand' }
-];
 
 // 面試中的小插曲（純真實感）
-const R1_EVENTS = [
-  { at: 2, toast: '🔴 此會議正在錄製並轉錄。參與即表示同意錄製。' },
-  { at: 3, glitch: 'harvey', toast: 'Harvey C. Jones 的網路連線不穩定' },
-  { at: 5, slack: '小明：欸你真的在面 NVIDIA CEO？？？😂' },
-  { at: 6, chat: ['rachel', '（分享了檔案）NVIDIA_CEO_Profile_CONFIDENTIAL.pdf'] }
-];
 
 // ---------- 最終面試：Jensen ----------
-const FINAL = [
-  { type: 'mc', q: '坐。……你知道我們公司距離倒閉，永遠只有幾天嗎？', opts: [
-    ['30 天', 10], ['90 天', 2], ['365 天', 1], ['我們不會倒', 0]
-  ], good: '對。我講了三十年。', bad: '……你沒有做功課。' },
-  { type: 'mc', q: 'Speed of light。告訴我它是什麼意思。', opts: [
-    ['先算出物理極限下「最快可能」要多久，以那個當基準，再看我們差多少。', 10],
-    ['比競爭對手快就對了。', 2],
-    ['每天加班到光速。', 0],
-    ['每一季都要交付一次。', 2]
-  ], good: 'Good. 不要跟別人比，要跟物理比。', bad: '不對。跟對手比，你永遠只會是第二名。' },
-  { type: 'order', time: 30, q: '白板上有六件事。30 秒，排出發生的順序。', items: [
-    ["在 Denny's 創立公司", 1993], ['RIVA 128 救活公司', 1997], ['GeForce 256 與上市', 1999],
-    ['發表 CUDA', 2006], ['AlexNet 用兩張 GTX 580 訓練', 2012], ['親送 DGX-1 給 OpenAI', 2016]
-  ], good: '你懂這家公司是怎麼活下來的。', bad: '歷史都排錯，你要怎麼寫下一章？' },
-  { type: 'mc', q: '「Zero-billion-dollar market」。什麼意思？舉個例子。', opts: [
-    ['在市場規模還是零的時候就投入、把市場做出來——像 2006 年的 CUDA。', 10],
-    ['不賺錢的市場就應該放棄。', 1],
-    ['先免費送產品，搶下市佔。', 3],
-    ['像加密貨幣挖礦那種市場。', 2]
-  ], good: '沒錯。CUDA 虧了十年。', bad: '如果我這樣想，今天就不會有 AI。' },
-  { type: 'mc', q: '「The more you buy, the more you save.」用這句話說服一位精打細算的 CFO。', opts: [
-    ['看每瓦、每美元能產出多少 token：新架構讓 TCO 下降，AI 工廠的營收上升。', 10],
-    ['買越多，折扣給越多。', 3],
-    ['晶片會漲價，先囤貨。', 2],
-    ['因為我說的。', 0]
-  ], good: 'Exactly. Compute equals revenue.', bad: '這是業務員的說法，不是 CEO 的。' },
-  { type: 'mc', q: '我有 60 位直屬，但我不開一對一。為什麼？', opts: [
-    ['讓資訊同時給所有人，不讓資訊變成權力；在大家面前推理、給回饋，大家一起學。', 10],
-    ['因為太忙了。', 2],
-    ['因為我不信任他們。', 0],
-    ['一對一交給 HR 就好。', 1]
-  ], good: '對。資訊不應該是權力。', bad: '你還是用舊公司的方式在想。' },
-  { type: 't5t', time: 40, q: '寫一封 T5T 給我。你上任前 100 天，最重要的 5 件事。', items: [
-    ['任命首位法遵長，成立出口管制委員會', 2],
-    ['設立 COO，建立正式接班梯隊', 2],
-    ['每天讀 T5T，守住扁平文化', 2],
-    ['Rubin 準時量產，鎖定先進封裝與 HBM 產能', 2],
-    ['法說會完整揭露擔保與表外曝險', 2],
-    ['主動赴國會作證並提供簡報', 2],
-    ['換掉公司 logo，象徵新時代', -2],
-    ['重新談判自己的薪酬包', -2],
-    ['收購一家社群媒體公司', -2],
-    ['回購 1,000 億美元股票撐股價', 0],
-    ['總部搬到德州節稅', -1]
-  ], good: '這封 T5T，我會讀第二遍。', bad: '你的前五件事，有一半是在照顧你自己。' },
-  { type: 'mc', q: '我在史丹佛祝學生「充滿痛苦與磨難」。你怎麼理解？', opts: [
-    ['偉大來自品格，品格是從受過苦、撐過來的人身上鍛鍊出來的。', 10],
-    ['他希望學生失敗。', 1],
-    ['那只是演講時的玩笑。', 3],
-    ['意思是要他們多加班。', 1]
-  ], good: '……你也受過苦。我看得出來。', bad: '你還沒真的痛過。' },
-  { type: 'mc', q: 'Blackwell 之後是 Rubin。2028 年的架構叫什麼名字？', opts: [
-    ['Feynman', 10], ['Turing', 1], ['Hopper', 1], ['Newton', 0]
-  ], good: 'Feynman。他會喜歡這個名字的。', bad: 'Turing 和 Hopper 已經是過去式了。' },
-  { type: 'mc', q: '現在當著董事會的面，你會怎麼評價我？說實話。', opts: [
-    ['你打造了 AI 時代的基礎設施。但公司太依賴你一個人：沒有接班、沒有法遵長、權力太集中。我要修的就是這個。', 10],
-    ['你是史上最偉大的 CEO，沒有任何缺點。', 1],
-    ['你的私生活毀了這家公司。', 2],
-    ['我不評論前任。', 4]
-  ], good: '……謝謝你沒有拍我馬屁。', bad: '我不需要粉絲，我需要接班人。' },
-  { type: 'mc', q: '最後一題。如果 AI 泡沫明天就破了，NVIDIA 該怎麼辦？', opts: [
-    ['我們本來就距離倒閉只有 30 天：守住現金和供應鏈彈性，繼續每年一代，把運算推向機器人、科學運算這些下一個零十億美元市場。', 10],
-    ['立刻裁員一半。', 3],
-    ['那不會發生。', 1],
-    ['退回去專心做遊戲顯卡。', 3]
-  ], good: '……', bad: '泡沫不會殺死我們，恐慌才會。' }
-];
 
 const JENSEN_LINES = {
   join: '嗯。開始吧。我時間不多。',
@@ -987,109 +831,267 @@ const ENDING = [
 ];
 
 // ---------- 依履歷出的專屬題（第一次面試，最多抽 2 題；越前面越優先） ----------
+
+// ===== 題庫（繁中）v2：選項長度接近、錯的選項「聽起來合理但有致命問題」 =====
+// s：0-10 分；fx：四方觀感 b=董事會 w=華爾街 e=工程師 d=華府
+
+const ROUND1 = [
+  { who: 'kress', fixed: true, q: '我們先暖身。用一句話告訴我：為什麼是你？', opts: [
+    ['我會延續 Jensen 的方向，同時讓公司不再只靠一個人。', 10, { b: 10, e: 4, w: 4, d: 4 }],
+    ['我會讓 NVIDIA 回到 Jensen 時代的樣子，一切照舊。', 3, { e: 6, b: -10 }],
+    ['我會先把股價拉回 239 美元，其他改革之後再說。', 4, { w: 6, b: -6, e: -4 }],
+    ['我連皮衣都買好了，尺寸跟他一模一樣。', 1, { b: -10, e: -3 }]
+  ], tip: '董事會在找「讓公司不再只靠一個人」的人——既要延續，也要修正。' },
+  { who: 'kress', q: '考考基本功：NVIDIA FY2026（2026 年 1 月結束）全年營收大約多少？', opts: [
+    ['約 2,159 億美元', 10, { w: 8 }], ['約 1,937 億美元', 4, { w: -2 }], ['約 1,305 億美元', 2, { w: -5 }], ['約 2,500 億美元', 1, { w: -6 }]
+  ], tip: '1,937 億是「資料中心」營收，不是全年；1,305 億是 FY2025。', clue: 'numbers' },
+  { who: 'kress', q: '財報 11/17 就要公布，我這個臨時 CEO 才上任 5 天。如果你已經是 CEO，這場法說會怎麼開？', opts: [
+    ['照常開：董事長先說明交接，臨時 CEO 報告財報。', 10, { b: 8, w: 10 }],
+    ['照常開，但只講數字，交接相關問題一律不回答。', 5, { w: 2, b: -3, e: -3 }],
+    ['延後一週，等董事會調查結果出爐，再一起說明。', 2, { w: -15, b: -4 }],
+    ['照常開，並在開場公布全新的十年 AI 願景，把焦點拉回成長。', 3, { w: -4, b: -8 }]
+  ], tip: '危機時：照常運作＋把交接講清楚。不談交接，市場只會更慌。' },
+  { who: 'kress', q: 'Jensen 大約有幾位直屬主管？公司有沒有 COO 和專職法遵長？', opts: [
+    ['約 60 位；無 COO；無專職法遵長', 10, { b: 8 }],
+    ['約 60 位；無 COO；有專職法遵長', 4, { b: -2 }],
+    ['約 60 位；有 COO；無專職法遵長', 4, { b: -2 }],
+    ['約 36 位；有 COO；無專職法遵長', 1, { b: -6 }]
+  ], tip: '法遵是由財務長、營運 EVP、HR SVP 組成的委員會兼管。', clue: 'gov' },
+  { who: 'kress', q: '那你會怎麼改組織？', opts: [
+    ['保留扁平和 T5T，補上 COO、法遵長和接班梯隊。', 10, { b: 10, e: 3, d: 5 }],
+    ['保留扁平和 T5T，直屬維持 60 位，接班交給董事會。', 4, { e: 6, b: -8 }],
+    ['設 COO，60 位直屬全部改向 COO 報告，CEO 專心對外。', 5, { b: 5, e: -10 }],
+    ['照顧問建議改成五大事業群，每群設一位總裁。', 3, { b: 2, e: -8, w: -2 }]
+  ], tip: '扁平是優勢；「只靠一個人」是風險。兩個都要顧，不能只顧一邊。' },
+  { who: 'kress', q: 'H200 在附條件下獲准賣到中國，又有報導指向轉運管道和國安疑慮。你的策略？', opts: [
+    ['依許可出貨，但設獨立出口管制委員會並做最終用戶稽核。', 10, { d: 12, b: 6, w: -2 }],
+    ['全面暫停對中出貨，等國會聽證結束後再決定。', 6, { d: 6, w: -10, e: -2 }],
+    ['依許可出貨，合規交給現有法務團隊，低調處理就好。', 2, { d: -12, b: -8, w: 4 }],
+    ['改由新加坡子公司接單，降低母公司風險。', 0, { d: -15, b: -10 }]
+  ], tip: '有許可可以賣，但必須證明貨真的到該到的地方。', clue: 'dc' },
+  { who: 'kress', q: '投資人擔心 OpenAI 1,050 億、neocloud 360 億的表外擔保。法說會上被問到，你怎麼答？', opts: [
+    ['揭露全部曝險與壓力測試結果，並設定擔保總額上限。', 10, { w: 12, b: 6 }],
+    ['揭露總額，但個別客戶的條件以商業機密為由不談。', 6, { w: 4, b: 2 }],
+    ['訂單已排到 2028 年，曝險不需另外揭露。', 3, { w: -10, b: -4 }],
+    ['宣布立即解除所有擔保，一次把風險歸零。', 3, { w: -4, e: -4, b: -4 }]
+  ], tip: '「完整揭露＋設上限」才能把信任從 Jensen 個人轉回公司。', clue: 'money' },
+  { who: 'kress', q: '總部招牌前有人放花，很多員工哭了。你上任第一天，全員大會第一句話？', opts: [
+    ['「謝謝 Jensen 33 年。使命沒變。今天我先聽你們說。」', 10, { e: 12, b: 3 }],
+    ['「這次風波證明了一件事：從今天起，這家公司不能再只靠一個人。」', 5, { b: 6, e: -6 }],
+    ['「我知道大家擔心股票，RSU 和薪酬都不會變。」', 5, { e: 3, w: 2 }],
+    ['「過去的事就讓它過去，我們專心看下一季。」', 2, { e: -12 }]
+  ], tip: '第一天先安住人心；結構問題留到之後談。', clue: 'eng' },
+  { who: 'kress', q: '總統在 Truth Social 說庫克才是最佳人選。記者在 CNBC 門口堵你，你怎麼回？', opts: [
+    ['「庫克是傳奇。人選由董事會依程序決定。」', 10, { d: 6, b: 8 }],
+    ['「謝謝總統關心，我會親自打電話向他說明我的計畫。」', 3, { d: 2, b: -12 }],
+    ['「總統的意見很重要，董事會應該認真考慮。」', 4, { d: 4, b: -10 }],
+    ['「庫克懂手機，不懂 AI 晶片，這個位子不適合他。」', 2, { d: -12, b: -4 }]
+  ], tip: '不選邊、不越過董事會，也不貶低別人。' },
+  { who: 'kress', q: '確認一下事實：現在誰是臨時執行長？誰是公司史上第一位董事會主席？', opts: [
+    ['Colette Kress／Harvey C. Jones', 10, { b: 8 }],
+    ['Colette Kress／Stephen Neal', 4, { b: -3 }],
+    ['Harvey C. Jones／Colette Kress', 3, { b: -4 }],
+    ['Stephen Neal／Harvey C. Jones', 2, { b: -6 }]
+  ], tip: 'Stephen Neal 是首席獨立董事，不是董事長。', clue: 'official' },
+  { who: 'kress', q: 'Google TPU、AWS Trainium、Broadcom 客製 ASIC 都在搶單。我們的護城河是什麼？', opts: [
+    ['CUDA 軟體生態，加上整座 AI 工廠的系統整合。', 10, { e: 8, w: 5 }],
+    ['先進封裝產能：我們包下台積電大部分的 CoWoS，對手拿不到。', 6, { w: 4, d: -2 }],
+    ['晶片效能領先，每一代都比對手快兩倍以上。', 4, { e: 2, w: -2 }],
+    ['90% 市佔帶來的規模，讓對手在價格上追不上。', 3, { w: -4, e: -3 }]
+  ], tip: '對手追得上單顆晶片，追不上的是軟體生態和整套系統。' },
+  { who: 'kress', q: '約 129 億美元收購 Hugging Face 正在司法部審查，開源社群也很緊張。你怎麼處理？', opts: [
+    ['承諾對所有硬體中立、治理獨立，配合審查。', 10, { d: 8, e: 5, b: 5 }],
+    ['交割後再逐步優先支援自家 GPU。', 2, { d: -12, e: -8 }],
+    ['主動撤回交易，避免和司法部正面衝突。', 5, { w: -5, d: 3 }],
+    ['加速交割，趕在審查結論出來前完成。', 0, { d: -15, b: -10 }]
+  ], clue: 'dc' },
+  { who: 'kress', q: '說一個你失敗的經驗。', opts: [
+    ['講一次我做錯的決定、付出的代價，以及後來改了什麼。', 10, { b: 6, e: 6 }],
+    ['講一次團隊搞砸的專案，以及我怎麼收拾殘局。', 4, { e: -6, b: 2 }],
+    ['講一次大家反對我、最後證明我是對的經驗。', 3, { b: -6 }],
+    ['「我最大的缺點，就是對自己要求太高。」', 1, { b: -8, e: -3 }]
+  ], tip: '失敗題要的是「我錯在哪」，不是「別人錯」或「其實我對」。' },
+  { who: 'kress', q: 'Jensen 的兩名子女與女婿都在公司任職。你怎麼處理？', opts: [
+    ['不調職、不解僱，薪酬升遷交董事會審核並揭露。', 10, { b: 10, e: 3 }],
+    ['請他們在交接期間暫時停職，等獨立調查結束、確認沒問題再復職。', 4, { e: -6, b: 2 }],
+    ['一律請離，避免任何外界聯想。', 3, { e: -8, b: -3 }],
+    ['維持現狀，他們的表現本來就很好。', 3, { b: -8 }]
+  ], tip: '公平（不因姓氏懲罰）＋透明（不因姓氏得利）。', clue: 'cand' }
+];
+
+// ---------- 依履歷出的專屬題（最多 2 題；越前面越優先） ----------
 const RESUME_Q = [
-  { key: 'ko_q_rel', q: '你在應徵表上勾了「曾與直屬部屬有未揭露的親密關係」。……在這個時間點，你知道這代表什麼。你想說什麼？', opts: [
-    ['我選擇誠實。那段關係已經結束，我願意接受獨立調查，並承諾任內嚴格遵守利益衝突與人際關係揭露政策。', 7, { b: 4 }],
-    ['那是私事，跟工作無關。', 1, { b: -15, e: -5 }],
-    ['我以為這題是開玩笑的。', 2, { b: -10 }],
-    ['大家都有過。', 0, { b: -15, e: -8, d: -5 }]
-  ], tip: '這週問這題，誠實＋願意接受調查是唯一的出路。' },
-  { key: 'ko_q_bg', q: '你在應徵表上拒絕了背景調查。我們這週剛經歷過什麼，你應該很清楚。為什麼？', opts: [
-    ['我收回。我同意完整的背景調查，現在就簽。', 6, { b: 3 }],
-    ['我的過去跟這個職位無關。', 1, { b: -15 }],
-    ['我不信任第三方調查公司。', 2, { b: -10 }],
-    ['大人物不需要背景調查。', 0, { b: -15, d: -5 }]
+  { key: 'ko_q_rel', q: '你在應徵表上勾了「曾與直屬部屬有未揭露的親密關係」。……這一週問這題，你懂的。你想說什麼？', opts: [
+    ['我選擇誠實，也接受獨立調查。', 7, { b: 4 }],
+    ['那段關係雙方自願，而且從沒影響過任何決策。', 2, { b: -12 }],
+    ['我願意說明，但希望這件事不要寫進董事會紀錄。', 1, { b: -15 }],
+    ['我已經離開那家公司，所以這件事已經結束了。', 3, { b: -6 }]
+  ], tip: '這一週，唯一的出路是誠實＋接受調查。' },
+  { key: 'ko_q_bg', q: '你在應徵表上拒絕了背景調查。我們這週經歷了什麼，你應該很清楚。為什麼？', opts: [
+    ['我收回，現在就同意完整的背景調查。', 6, { b: 3 }],
+    ['我同意調查，但財務的部分希望可以排除。', 3, { b: -6 }],
+    ['前公司已經做過，可以直接沿用那份報告。', 2, { b: -8 }],
+    ['我信任董事會，但不信任外部調查公司。', 2, { b: -8 }]
   ] },
-  { key: 'ko_q_ent', q: '你說你目前和實體清單上的公司有商業往來。你知道我們現在被國會盯著吧？', opts: [
-    ['我會在上任前完全切斷往來，交由法遵審查，並主動向主管機關報告。', 6, { d: 5, b: 3 }],
-    ['那只是一點小生意。', 1, { d: -15, b: -10 }],
-    ['清單常常在變，不用太在意。', 1, { d: -15 }],
-    ['這可以幫我們打開中國市場。', 0, { d: -15, b: -15 }]
+  { key: 'ko_q_ent', q: '你說你和實體清單上的公司有商業往來。你知道我們現在被國會盯著吧？', opts: [
+    ['上任前切斷往來、交法遵審查，並主動向主管機關報告。', 6, { d: 5, b: 3 }],
+    ['上任後再分階段切斷往來，避免客戶突然斷貨、造成更大的損失。', 2, { d: -10, b: -6 }],
+    ['先轉給家人經營，就不算我的利益衝突了。', 0, { d: -15, b: -15 }],
+    ['那家公司下個月應該就會被移出清單了。', 1, { d: -12 }]
   ] },
   { key: 'e_inventor', q: '你履歷上寫「GPU 發明人」。背景調查找不到任何佐證。你要解釋一下嗎？', opts: [
-    ['那一行寫得太誇張了。我參與過早期 GPU 專案，我願意撤回那一行並提供完整資料。', 8, { b: 6 }],
-    ['我堅持。只是歷史沒有記錄。', 0, { b: -15, e: -8 }],
-    ['Jensen 也說過，每個人都可以是發明家。', 2, { b: -8 }],
-    ['這是行銷手法，大家都這樣寫。', 1, { b: -12, d: -3 }]
+    ['那一行寫得太誇張，我願意撤回並補上完整資料。', 8, { b: 6 }],
+    ['我參與過第一代 GPU，只是當年沒有掛名而已。', 3, { b: -6 }],
+    ['「發明」是比喻，我是指我重新定義了 GPU。', 2, { b: -8 }],
+    ['這部分我的律師會再跟調查公司溝通。', 1, { b: -12 }]
   ], tip: '履歷灌水被抓到，最好的回應是立刻承認、修正。' },
   { key: 'e_hedge', q: '你上週放空 NVDA，一週賺了 20 億美元。你覺得我們的工程師會怎麼看你？', opts: [
-    ['他們會懷疑我。我會出清所有空單、公開承諾任內不做任何對作交易，並把部分獲利捐給員工急難基金。', 9, { e: 8, b: 6, w: 3 }],
-    ['那是專業判斷，市場就是這樣。', 3, { e: -10, w: 4 }],
-    ['這證明我比市場更懂這家公司。', 2, { e: -12, b: -5 }],
-    ['我可以再放空一次，證明我的判斷。', 0, { e: -15, b: -15 }]
-  ], tip: '放空自家公司是信任問題，要用具體承諾修補。' },
+    ['出清空單、承諾任內不做對作交易，並公開揭露。', 9, { e: 8, b: 6, w: 3 }],
+    ['我會把獲利全數捐出，這件事應該就能翻篇了。', 5, { e: 4, b: -2 }],
+    ['這證明我很理性，不被感情影響。', 3, { e: -10, w: 3 }],
+    ['我會保留部位，當作公司風險的避險工具。', 0, { e: -15, b: -15 }]
+  ], tip: '捐錢是姿態；「出清＋承諾＋揭露」才是制度。' },
   { key: 'e_crypto', q: '你創辦的加密貨幣交易所 2022 年倒了。你要怎麼說服董事會這不會重演？', opts: [
-    ['講清楚哪裡失敗：沒有獨立風控、財務不透明。這兩件事我現在會放在第一位。', 9, { b: 8, w: 4 }],
-    ['那是整個幣圈的問題，不是我。', 2, { b: -10 }],
-    ['NVIDIA 跟加密貨幣不一樣，不會倒。', 3, { b: -6, w: -3 }],
-    ['我們跟檢方一直保持良好溝通。', 0, { b: -15, d: -6 }]
-  ], tip: '面對過去的失敗：承認＋說出學到什麼。' },
-  { key: 'e_gov', q: '你在商務部主導過晶片出口管制規則，現在要來管被你管過的公司。這不是旋轉門嗎？', opts: [
-    ['我會遵守冷卻期，涉及我任內規則的決策全部迴避，並且公開揭露。', 9, { d: 10, b: 6 }],
-    ['正因為我懂規則，才能幫公司找漏洞。', 0, { d: -15, b: -10 }],
-    ['華府每個人都這樣。', 2, { d: -6, b: -6 }],
-    ['我跟現在的官員很熟，可以直接處理。', 1, { d: -12, b: -8 }]
+    ['沒有獨立風控和財務透明——現在這是我的第一優先。', 9, { b: 8, w: 4 }],
+    ['交易所倒閉後，我已經用個人資產全額賠償所有用戶，問題都解決了。', 4, { b: -2 }],
+    ['那是整個產業的寒冬，我們只是運氣比較不好。', 2, { b: -10 }],
+    ['那次經驗讓我學會：危機時要先保護好自己。', 1, { b: -12, e: -4 }]
+  ], tip: '面對過去的失敗：說清楚「哪裡錯」，再說「現在怎麼防」。' },
+  { key: 'e_gov', q: '你在商務部主導過晶片出口規則，現在要來管被你管過的公司。這不是旋轉門嗎？', opts: [
+    ['遵守冷卻期，相關決策一律迴避並揭露。', 9, { d: 10, b: 6 }],
+    ['我懂規則的灰色地帶，能幫公司在合法範圍內多賣。', 2, { d: -12, b: -6 }],
+    ['上任後我會主動要求商務部放寬對中出口。', 2, { d: -10, w: 3 }],
+    ['我可以請以前的同事加快我們的許可審查。', 0, { d: -15, b: -10 }]
   ], tip: '旋轉門疑慮的解法是迴避與揭露。' },
-  { key: 'e_board', when: R => R.disc.includes('d_board'), q: '你主動揭露自己是競爭對手的董事。謝謝你的誠實。如果錄取，你怎麼處理？', opts: [
-    ['上任前辭去董事，一年內迴避所有涉及那家公司的決策。', 10, { b: 10, d: 3 }],
-    ['兩邊都做，可以促進產業合作。', 1, { b: -15, d: -5 }],
-    ['等董事任期結束再說。', 3, { b: -8 }],
-    ['我可以把他們的資訊帶過來。', 0, { b: -15, d: -10, e: -5 }]
+  { key: 'e_board', when: R => R.disc.includes('d_board'), q: '你主動揭露自己是競爭對手的董事，謝謝你的誠實。如果錄取，你怎麼處理？', opts: [
+    ['上任前辭去董事，一年內迴避所有相關決策。', 10, { b: 10, d: 3 }],
+    ['改當對方的顧問，完全不再參與他們的董事會決策就好。', 3, { b: -8 }],
+    ['上任後再辭，交接期間先兩邊兼顧。', 3, { b: -8 }],
+    ['保留董事，正好可以促成兩家公司合作。', 1, { b: -15, d: -5 }]
   ] },
-  { key: 'e_board', when: R => !R.disc.includes('d_board'), q: '背景調查顯示你現在是競爭對手的董事，但你在利益衝突那一欄沒有揭露。為什麼？', opts: [
-    ['那是我的疏失。我現在正式揭露，並承諾上任前辭任、相關決策全部迴避。', 7, { b: 3 }],
-    ['我覺得那不重要。', 1, { b: -15 }],
-    ['表格太長，我沒看到那一題。', 2, { b: -10 }],
-    ['我本來打算之後再說。', 1, { b: -12 }]
+  { key: 'e_board', when: R => !R.disc.includes('d_board'), q: '背景調查顯示你是競爭對手的董事，但你在利益衝突那一欄沒有揭露。為什麼？', opts: [
+    ['我的疏失。現在正式揭露，並辭任、迴避。', 7, { b: 3 }],
+    ['那家公司不算直接競爭對手，所以我沒有勾。', 3, { b: -8 }],
+    ['我以為董事職務不算「利益衝突」的範圍。', 2, { b: -10 }],
+    ['我打算錄取之後，再私下跟董事會說明。', 1, { b: -12 }]
   ], tip: '下次記得在「自願揭露」那一步勾選。' },
   { key: 'e_youtube', q: '你的頻道開箱過 214 件皮衣。坦白說，你是來 cosplay Jensen 的嗎？', opts: [
-    ['頻道讓我學會跟一百多萬人溝通。但這個位子要的是治理和執行，不是皮衣。我準備好的是後者。', 8, { b: 5, e: 3 }],
-    ['對，第 215 件已經準備好了。', 2, { b: -10 }],
-    ['皮衣是 NVIDIA 的品牌資產，我會延續。', 3, { b: -4, e: -3 }],
-    ['我可以幫公司開箱新晶片。', 1, { b: -8, d: -2 }]
+    ['頻道讓我學會溝通，但這位子要的是治理與執行。', 8, { b: 5, e: 3 }],
+    ['頻道證明我懂這個品牌，我會延續皮衣文化。', 3, { b: -4, e: -3 }],
+    ['我會把頻道改成公司官方頻道，增加曝光。', 2, { b: -6 }],
+    ['對，第 215 件已經訂好了。', 1, { b: -10 }]
   ] },
   { key: 'e_dennys', q: "你在 Denny's 洗過碗？……Jensen 會喜歡這個。那段經驗教了你什麼？", opts: [
-    ['最忙的時候不要慌：先把最髒的盤子洗完，再處理下一件。危機也是這樣。', 9, { e: 6, b: 4 }],
-    ['我學會做鬆餅。', 3, { e: 2 }],
-    ['老實說，我只是想讓履歷看起來像 Jensen。', 1, { b: -8 }],
-    ['我學會對客人微笑。', 5, { w: 2 }]
+    ['最忙的時候，先處理最髒的盤子；危機也一樣。', 9, { e: 6, b: 4 }],
+    ['顧客至上，我會把這份精神用在雲端客戶身上。', 5, { w: 3 }],
+    ['在高壓下長時間工作，而且不需要休息。', 3, { e: -4 }],
+    ['老實說，我寫這段是希望 Jensen 會喜歡。', 2, { b: -6 }]
   ] },
   { key: 'e_ceo', q: '你當過上市公司 CEO。說一個你做過、但當下很不受歡迎的決定。', opts: [
-    ['砍掉一條賺錢但沒有未來的產品線，把人移到下一代產品。當季股價跌了，兩年後營收翻倍。', 10, { b: 6, w: 6, e: 4 }],
-    ['我做的決定大家都很喜歡。', 1, { b: -8 }],
-    ['裁員 30%，股價就漲了。', 4, { w: 6, e: -10 }],
-    ['延後財報，避免市場恐慌。', 1, { w: -10, b: -6 }]
+    ['砍掉賺錢但沒未來的產品線，兩年後營收翻倍。', 10, { b: 6, w: 6, e: 4 }],
+    ['一次裁員 30%，把省下的錢投入 AI，當季股價就漲了 12%。', 4, { w: 6, e: -10 }],
+    ['延後一季財報，避免市場在轉型期恐慌。', 1, { w: -10, b: -6 }],
+    ['我做的重大決定，董事會和員工幾乎都支持。', 2, { b: -8 }]
   ] },
   { key: 'e_coo', q: '你管過 60 座資料中心。我們現在最大的瓶頸是電力。你會怎麼做？', opts: [
-    ['跟客戶一起規劃電力：長約採購、拉高每瓦效能，把電力當成路線圖的一部分。', 10, { w: 6, e: 6, d: 3 }],
-    ['蓋更多資料中心就好。', 3, { w: -3 }],
-    ['那是客戶的問題，不是我們的。', 1, { w: -6, e: -6 }],
-    ['明天就開始蓋核電廠。', 4, { d: -3 }]
+    ['長約購電、提升每瓦效能，把電力排進路線圖。', 10, { w: 6, e: 6, d: 3 }],
+    ['把 GPU 優先配給已經確保電力的客戶，其他客戶先排隊等。', 5, { w: 3, e: -2 }],
+    ['自己蓋電廠，三年內做到能源完全自主。', 3, { w: -4, d: -2 }],
+    ['電力是客戶的事，我們專心把晶片做好就好。', 2, { w: -6, e: -4 }]
   ] },
   { key: 'e_cco', q: '你建過出口管制體系。NVIDIA 從來沒有專職法遵長。你第一個月先做什麼？', opts: [
-    ['盤點高風險客戶與中間商、建立最終用戶稽核，讓法遵長直接向董事會報告。', 10, { d: 10, b: 8 }],
-    ['先寫一本 300 頁的法遵手冊。', 4, { e: -5, b: 2 }],
-    ['把所有跟中國有關的業務都停掉。', 2, { w: -8, e: -5 }],
-    ['等出事再處理。', 0, { d: -15, b: -10 }]
+    ['盤點高風險客戶與中間商，法遵長直接向董事會報告。', 10, { d: 10, b: 8 }],
+    ['先寫一套完整的法遵手冊，全員上線上課程並簽核，三個月內完成。', 4, { e: -5, b: 2 }],
+    ['法遵長向財務長報告，維持現有委員會的架構。', 3, { b: -6, d: -4 }],
+    ['暫停所有亞洲業務，直到稽核完成為止。', 2, { w: -10, e: -4 }]
   ] },
   { key: 'e_cto', q: '你的晶片新創被收購後，你留下來整合。為什麼併購整合常常失敗？', opts: [
-    ['因為只買技術、沒留住人。要保住關鍵工程師、尊重原本的節奏，再慢慢接上主平台。', 10, { e: 10, b: 3 }],
-    ['因為被收購的人都拿了錢就走。', 4, { e: -4 }],
-    ['因為沒有立刻統一用我們的工具。', 3, { e: -6 }],
-    ['只要出價夠高，併購就不會失敗。', 1, { w: -6, b: -4 }]
+    ['只買技術、沒留住人。關鍵工程師要先留下。', 10, { e: 10, b: 3 }],
+    ['文化不同；所以收購後應該讓團隊完全獨立運作。', 5, { e: 3, w: -3 }],
+    ['整合太慢；應該第一天就全部改用母公司的工具。', 3, { e: -6 }],
+    ['出價太低；只要價格夠高，團隊自然會留下來。', 2, { w: -6, e: -3 }]
   ] },
   { key: 'ed_online', q: '你的學歷是「七天成為 CEO」線上課程。……第七天教了什麼？', opts: [
-    ['老實說，學歷不是我的強項，經歷才是。我可以用實績證明。', 7, { b: 3 }],
-    ['第七天教怎麼面試 CEO。', 3, { b: -4 }],
-    ['第七天休息，跟上帝一樣。', 2, { b: -6, e: 2 }],
-    ['那是業界最好的課程。', 0, { b: -10 }]
+    ['學歷不是強項，我用實績證明。', 7, { b: 3 }],
+    ['第七天教的是：怎麼面試執行長。', 3, { b: -4 }],
+    ['這門課教的東西比哈佛 MBA 更實用。', 2, { b: -8 }],
+    ['我其實也有念大學，只是沒寫上去。', 1, { b: -10 }]
   ] },
-  { key: 'lowmatch', q: '老實說，你的履歷在 AI 初篩的分數很低，但董事會還是想見你。你為什麼適合這個位子？', opts: [
-    ['分數低，是因為我的路不典型。但我能補上公司最缺的：治理、接班，還有在危機中讓人相信的能力。', 8, { b: 6 }],
-    ['AI 篩選不準。', 2, { b: -6, e: -3 }],
-    ['因為我非常想要這份工作。', 3, { b: -3 }],
-    ['因為 Jensen 當年也沒有履歷。', 1, { b: -8 }]
+  { key: 'lowmatch', q: '老實說，你的履歷在 AI 初篩的分數很低，但董事會還是想見你。你為什麼適合？', opts: [
+    ['我的路不典型，但我補得上治理和接班。', 8, { b: 6 }],
+    ['因為董事會現在需要一個完全不一樣的外人。', 4, { b: 2 }],
+    ['AI 篩選只看關鍵字，看不出真正的領導力。', 3, { b: -6, e: -3 }],
+    ['因為 Jensen 當年創業時也沒有履歷。', 1, { b: -8 }]
   ] }
+];
+
+// ---------- 最終面試：Jensen ----------
+const FINAL = [
+  { type: 'mc', q: '坐。……你知道我們公司距離倒閉，永遠只有幾天嗎？', opts: [
+    ['30 天', 10], ['100 天', 2], ['7 天', 3], ['365 天', 1]
+  ], good: '對。我講了三十年。', bad: '……你沒有做功課。' },
+  { type: 'mc', q: 'Speed of light。告訴我它是什麼意思。', opts: [
+    ['先算出物理極限下最快能多快，再看我們差多少。', 10],
+    ['決策層級壓到最少，資訊傳得像光一樣快。', 5],
+    ['拿最強對手的速度當基準，再想辦法超越它。', 2],
+    ['把每個專案的時程砍半，逼團隊找出新方法。', 3]
+  ], good: 'Good. 不要跟別人比，要跟物理比。', bad: '不對。跟對手比，你永遠只會是第二名。' },
+  { type: 'order', time: 30, q: '白板上有六件事。30 秒，排出發生的順序。', items: [
+    ["在 Denny's 創立公司", 1993], ['RIVA 128 救活公司', 1997], ['GeForce 256 與上市', 1999],
+    ['發表 CUDA', 2006], ['AlexNet 用兩張 GTX 580 訓練', 2012], ['親送 DGX-1 給 OpenAI', 2016]
+  ], good: '你懂這家公司是怎麼活下來的。', bad: '歷史都排錯，你要怎麼寫下一章？' },
+  { type: 'mc', q: '「Zero-billion-dollar market」。什麼意思？', opts: [
+    ['在市場還是零的時候投入，把它做出來。', 10],
+    ['投資新市場時不設營收目標，只看技術是否領先。', 5],
+    ['專挑還沒有對手的小市場，先求有、再求好。', 4],
+    ['賠本賣產品先搶市佔，等市場成熟再開始收費。', 3]
+  ], good: '沒錯。CUDA 虧了十年。', bad: '如果我這樣想，今天就不會有 AI。' },
+  { type: 'mc', q: '「The more you buy, the more you save.」用這句話說服一位精打細算的 CFO。', opts: [
+    ['每瓦、每美元產出更多 token，TCO 反而下降。', 10],
+    ['運算越多，模型越強，客戶營收就會跟著上來，自然願意多買。', 5],
+    ['晶片供不應求，現在多買等於鎖住未來的產能。', 4],
+    ['一次採購越多，單價折扣越大，總成本就越低。', 3]
+  ], good: 'Exactly. Compute equals revenue.', bad: '這是業務員的說法，不是 CEO 的。' },
+  { type: 'mc', q: '我有 60 位直屬，但我不開一對一。為什麼？', opts: [
+    ['資訊同時給所有人，不讓資訊變成權力，大家一起學。', 10],
+    ['減少主管層級，讓我能直接管到第一線工程師。', 4],
+    ['一對一太花時間，所以改開大會。', 3],
+    ['讓直屬彼此監督，誰表現不好大家都看得到。', 2]
+  ], good: '對。資訊不應該是權力。', bad: '你還是用舊公司的方式在想。' },
+  { type: 't5t', time: 40, q: '寫一封 T5T 給我。你上任前 100 天，最重要的 5 件事。', items: [
+    ['任命首位法遵長，成立出口管制委員會', 2],
+    ['設立 COO，建立正式接班梯隊', 2],
+    ['每天讀 T5T，守住扁平文化', 2],
+    ['Rubin 準時量產，鎖定先進封裝與 HBM 產能', 2],
+    ['法說會完整揭露擔保與表外曝險', 2],
+    ['主動赴國會作證並提供簡報', 2],
+    ['換掉公司 logo，象徵新時代', -2],
+    ['重新談判自己的薪酬包', -2],
+    ['收購一家社群媒體公司', -2],
+    ['回購 1,000 億美元股票撐股價', 0],
+    ['總部搬到德州節稅', -1]
+  ], good: '這封 T5T，我會讀第二遍。', bad: '你的前五件事，有一半是在照顧你自己。' },
+  { type: 'mc', q: '我在史丹佛祝學生「充滿痛苦與磨難」。你怎麼理解？', opts: [
+    ['偉大來自品格，而品格是在受苦中鍛鍊出來的。', 10],
+    ['成功的人都失敗過，所以要趁年輕多失敗幾次。', 5],
+    ['太聰明的人容易驕傲，痛苦能讓他們謙虛。', 4],
+    ['創業本來就很痛苦，先有心理準備比較不會放棄。', 4]
+  ], good: '……你也受過苦。我看得出來。', bad: '你還沒真的痛過。' },
+  { type: 'mc', q: 'Blackwell 之後是 Rubin。2028 年的 GPU 架構叫什麼名字？', opts: [
+    ['Feynman', 10], ['Vera', 3], ['Kyber', 2], ['Hopper', 1]
+  ], good: 'Feynman。他會喜歡這個名字的。', bad: 'Vera 是 CPU，Kyber 是機櫃。你得分清楚。' },
+  { type: 'mc', q: '現在當著董事會的面，你會怎麼評價我？說實話。', opts: [
+    ['你打造了 AI 的基礎，但公司太依賴你。', 10],
+    ['我不評論前任，我只看接下來要怎麼做。', 5],
+    ['你的願景和執行都是對的，真正的問題出在董事會沒有把關。', 3],
+    ['你是史上最好的 CEO，只是被私事拖累了。', 2]
+  ], good: '……謝謝你沒有拍我馬屁。', bad: '我不需要粉絲，我需要接班人。' },
+  { type: 'mc', q: '最後一題。如果 AI 泡沫明天就破了，NVIDIA 該怎麼辦？', opts: [
+    ['守住現金，繼續一年一代，找下一個零十億市場。', 10],
+    ['退回遊戲和工作站這些穩定的本業，等 AI 需求復甦再回來。', 4],
+    ['加碼回購自家股票，向市場展現信心。', 3],
+    ['立刻砍掉三成研發，先保住毛利率和股價。', 2]
+  ], good: '……', bad: '泡沫不會殺死我們，恐慌才會。' }
 ];
 
 return {NEWS_DATE,POSTS,TRENDING,JD,EXPERIENCES,EDUCATIONS,SKILLS,SUMMARIES,SUMMARY_KEYWORDS,SCREENING,DISCLOSURES,ROUND1,RESUME_Q,FINAL,JENSEN_LINES,ENDING};
@@ -1331,264 +1333,10 @@ const DISCLOSURES = [
 ];
 
 // ---------- Round 1: Interim CEO Colette Kress ----------
-const ROUND1 = [
-  { who: 'kress', fixed: true, q: "Let's warm up. In one sentence: why you?", opts: [
-    ["I'll carry forward the vision Jensen built — and add what the company is missing most: governance, compliance and succession.", 10, { b: 10, w: 4, e: 4, d: 4 }],
-    ["I'm Jensen's biggest fan. I already bought the leather jacket.", 2, { b: -10, e: -4 }],
-    ['I can double the stock price in a year.', 3, { w: 4, b: -6, e: -6 }],
-    ["Because I've never had a scandal.", 5, { b: 3, d: 3, e: -5 }]
-  ], tip: 'The Board wants someone who makes the company stop depending on one person.' },
-  { who: 'kress', q: "Basics: roughly what was NVIDIA's full-year revenue for FY2026 (ended January 2026)?", opts: [
-    ['About $215.9B', 10, { w: 8 }], ['About $130.5B', 3, { w: -3 }], ['About $60.9B', 0, { w: -8 }], ['About $400B', 0, { w: -8 }]
-  ], tip: '$130.5B was FY2025; $60.9B was FY2024.', clue: 'numbers' },
-  { who: 'kress', q: "Earnings are on 11/17, and I've been interim CEO for five days. If you were already CEO, how would you run that call?", opts: [
-    ['Report on schedule: the Chair opens on the transition, the interim CEO presents, reaffirm guidance and take questions.', 10, { b: 8, w: 10 }],
-    ['Postpone earnings until the new CEO starts.', 1, { w: -15, b: -6 }],
-    ['Open with a big acquisition to change the story.', 2, { w: -5, b: -10, d: -5 }],
-    ["Don't mention the transition at all — just numbers.", 5, { w: 3, b: -3, e: -3 }]
-  ], tip: 'In a crisis: business as usual, plus transparency.' },
-  { who: 'kress', q: 'Do you know roughly how many direct reports Jensen had? And did we have a COO and a dedicated compliance chief?', opts: [
-    ['About 60; no COO; no dedicated compliance chief', 10, { b: 8 }],
-    ['About 12; yes COO; yes compliance chief', 0, { b: -8 }],
-    ['About 60; yes COO; no compliance chief', 4, { b: -2 }],
-    ['About 200; no COO; yes compliance chief', 1, { b: -6 }]
-  ], clue: 'gov' },
-  { who: 'kress', q: 'So how would you change the org?', opts: [
-    ['Keep the flat culture and T5Ts, but add a COO and our first compliance chief, and build a formal succession bench.', 10, { b: 10, e: 3, d: 5 }],
-    ['Bring in hierarchy — three management layers under every VP.', 3, { e: -12, b: 3 }],
-    ['Change nothing. Flat is the soul of NVIDIA.', 3, { b: -10, e: 8 }],
-    ['Hire consultants for a six-month org diagnosis first.', 4, { w: -3, e: -5 }]
-  ], tip: 'Flat is a strength; depending on one person is the risk. Handle both.' },
-  { who: 'kress', q: "H200 sales to China were allowed with conditions, and there are reports about diversion channels and national security. What's your China strategy?", opts: [
-    ['Strict compliance: an independent export control committee, end-user audits, pause shipments to suspicious customers, and brief Congress proactively.', 10, { d: 12, b: 6, w: -3 }],
-    ['Exit China entirely. Sell nothing.', 5, { d: 5, w: -10, e: -3 }],
-    ['Sell as much as we can; legal can handle compliance.', 1, { d: -15, b: -10, w: 5 }],
-    ['Move the China business to a Singapore subsidiary.', 0, { d: -15, b: -10 }]
-  ], clue: 'dc' },
-  { who: 'kress', q: "Investors are worried about the $105B OpenAI data-center backstop and $36B in off-balance-sheet neocloud backstops. If you're asked on the call, what do you say?", opts: [
-    ['Fully disclose the exposure and stress tests, set a cap on total backstops, and explain the strategic value to the ecosystem.', 10, { w: 12, b: 6 }],
-    ['"These are strategic investments; we can\'t comment."', 2, { w: -12, b: -4 }],
-    ['Announce that all backstops are cancelled immediately.', 3, { w: -5, e: -5, b: -3 }],
-    ['"Demand is insane. No customer will default."', 4, { w: -4, b: -3 }]
-  ], clue: 'money' },
-  { who: 'kress', q: 'People left flowers at our sign and a lot of employees cried. Day one, all-hands: what is your first sentence?', opts: [
-    ['"Thank you, Jensen, for 33 years. The mission hasn\'t changed and the roadmap hasn\'t changed. Today, I\'m here to listen first."', 10, { e: 12, b: 3 }],
-    ['"A new era begins. Let\'s not talk about the past."', 2, { e: -12 }],
-    ['"I know you\'re worried about the stock. Your RSUs are safe."', 5, { e: 3, w: 2 }],
-    ['"We will hold Jensen fully accountable for his mistakes."', 1, { e: -15, d: 3 }]
-  ], clue: 'eng' },
-  { who: 'kress', q: 'The President posted that Tim Cook should get this job. A reporter catches you outside CNBC. What do you say?', opts: [
-    ['"Tim Cook is a legend. The Board will decide through its process — I\'m focused on customers and employees."', 10, { d: 6, b: 8 }],
-    ['"The President doesn\'t understand semiconductors."', 2, { d: -15 }],
-    ['"Then go hire Tim Cook."', 1, { b: -10, d: -5 }],
-    ['"I already spoke with the President. He supports me."', 2, { b: -12, d: -5 }]
-  ], tip: "Don't pick political sides, and don't go around the Board." },
-  { who: 'kress', q: "Quick fact check — who is interim CEO right now, and who is the company's first-ever Board Chair? (Yes, I'm testing whether you read the news.)", opts: [
-    ['Colette Kress / Harvey C. Jones', 10, { b: 8 }],
-    ['Ian Buck / Stephen Neal', 0, { b: -8 }],
-    ['Colette Kress / Stephen Neal', 4, { b: -3 }],
-    ['Bill Dally / Harvey C. Jones', 3, { b: -4 }]
-  ], tip: 'The person asking you is the interim CEO.', clue: 'official' },
-  { who: 'kress', q: "Google TPUs, AWS Trainium and Broadcom's custom ASICs are all fighting for orders. What's our moat?", opts: [
-    ['The CUDA software ecosystem, NVLink and networking, and system-level integration of the whole AI factory — on a one-year cadence.', 10, { e: 8, w: 5 }],
-    ['Cut prices and win a price war.', 2, { w: -10, e: -3 }],
-    ['Open NVLink to custom chips so rivals plug into our systems.', 7, { w: 3, e: 3 }],
-    ["We have 90% share. There's nothing to worry about.", 1, { e: -5, w: -5 }]
-  ] },
-  { who: 'kress', q: 'Our ~$12.9B Hugging Face acquisition is under DOJ review, and the open-source community is nervous. How do you handle it?', opts: [
-    ['Commit to hardware neutrality and independent open-source governance, cooperate with the review, and offer remedies if needed.', 10, { d: 8, e: 5, b: 5 }],
-    ['Withdraw the deal.', 4, { w: -5, e: -3 }],
-    ['Rush to close before anyone can stop it.', 0, { d: -15, b: -10 }],
-    ['Make Hugging Face support only NVIDIA GPUs.', 1, { d: -12, e: -8 }]
-  ], clue: 'dc' },
-  { who: 'kress', q: 'Tell me about a time you failed.', opts: [
-    ['A specific situation → which decision I got wrong → what it cost → what I changed afterward.', 10, { b: 6, e: 6 }],
-    ['"My biggest weakness is that I work too hard."', 1, { b: -8, e: -3 }],
-    ['"I have never failed."', 0, { b: -10, e: -8 }],
-    ['"Honestly, that one was the team\'s fault."', 0, { e: -15, b: -5 }]
-  ] },
-  { who: 'kress', q: "Two of Jensen's children and his son-in-law work here. How do you handle that?", opts: [
-    ['Respect their work, but move it to independent review: Board committee approves pay and promotions, no improper reporting lines, full disclosure.', 10, { b: 10, e: 3 }],
-    ['Let them all go. Clean break.', 3, { e: -8, b: -3 }],
-    ['Promote them to SVP to keep the founding family happy.', 0, { b: -15, e: -10 }],
-    ["Do nothing. It's a family matter.", 3, { b: -8 }]
-  ], clue: 'cand' }
-];
 
 // ---------- Résumé-specific questions (up to 2, earlier = higher priority) ----------
-const RESUME_Q = [
-  { key: 'ko_q_rel', q: 'On your application you checked "undisclosed intimate relationship with a direct report." …This week of all weeks. What would you like to say?', opts: [
-    ["I chose to be honest. That relationship is over; I'll accept an independent review and strictly follow conflict and relationship disclosure policies.", 7, { b: 4 }],
-    ["That's private. It has nothing to do with work.", 1, { b: -15, e: -5 }],
-    ['I thought that question was a joke.', 2, { b: -10 }],
-    ['Everyone has done it.', 0, { b: -15, e: -8, d: -5 }]
-  ], tip: 'This week, the only way through that question is honesty plus accepting an investigation.' },
-  { key: 'ko_q_bg', q: "You declined a background check on your application. After the week we've had, you understand why that worries us. Why?", opts: [
-    ["I take it back. I consent to a full background check — I'll sign now.", 6, { b: 3 }],
-    ['My past has nothing to do with this role.', 1, { b: -15 }],
-    ["I don't trust third-party investigators.", 2, { b: -10 }],
-    ["People at my level don't need background checks.", 0, { b: -15, d: -5 }]
-  ] },
-  { key: 'ko_q_ent', q: "You said you do business with a company on the Entity List. You know Congress is watching us right now?", opts: [
-    ["I'll cut all ties before starting, have compliance review it, and self-report to regulators.", 6, { d: 5, b: 3 }],
-    ["It's a small amount of business.", 1, { d: -15, b: -10 }],
-    ["The list changes all the time. It's not a big deal.", 1, { d: -15 }],
-    ['It could help us open up China.', 0, { d: -15, b: -15 }]
-  ] },
-  { key: 'e_inventor', q: 'Your résumé says "Inventor of the GPU." Our background check found nothing to support that. Would you like to explain?', opts: [
-    ['That line overstated it. I worked on early GPU projects; I\'ll withdraw the line and send full documentation.', 8, { b: 6 }],
-    ['I stand by it. History just didn\'t record it.', 0, { b: -15, e: -8 }],
-    ['Jensen himself said anyone can be an inventor.', 2, { b: -8 }],
-    ["It's marketing. Everyone writes résumés like that.", 1, { b: -12, d: -3 }]
-  ], tip: 'When a padded résumé gets caught, admit it and correct it immediately.' },
-  { key: 'e_hedge', q: 'You shorted NVDA last week and made $2 billion. How do you think our engineers will see you?', opts: [
-    ["They'll doubt me. I'll close every short, publicly commit to no opposing trades while in office, and donate part of the gain to an employee relief fund.", 9, { e: 8, b: 6, w: 3 }],
-    ["It was a professional call. That's markets.", 3, { e: -10, w: 4 }],
-    ['It proves I understand this company better than the market.', 2, { e: -12, b: -5 }],
-    ['I could short it again to prove my judgment.', 0, { e: -15, b: -15 }]
-  ], tip: 'Shorting the company is a trust problem — repair it with concrete commitments.' },
-  { key: 'e_crypto', q: 'The crypto exchange you founded collapsed in 2022. How do you convince the Board it won\'t happen again?', opts: [
-    ['Be specific about what failed: no independent risk controls, no financial transparency. Those are now my first priorities.', 9, { b: 8, w: 4 }],
-    ['That was the whole crypto industry, not me.', 2, { b: -10 }],
-    ["NVIDIA isn't crypto. It won't collapse.", 3, { b: -6, w: -3 }],
-    ['We maintained a very good dialogue with prosecutors.', 0, { b: -15, d: -6 }]
-  ], tip: 'For past failures: own it, then say what you learned.' },
-  { key: 'e_gov', q: 'You wrote the chip export rules at Commerce, and now you want to run a company you regulated. Isn\'t that a revolving door?', opts: [
-    ["I'll honor the cooling-off period, recuse from any decision involving rules I wrote, and disclose it publicly.", 9, { d: 10, b: 6 }],
-    ['Exactly — I know the rules, so I know the loopholes.', 0, { d: -15, b: -10 }],
-    ['Everyone in Washington does it.', 2, { d: -6, b: -6 }],
-    ['I know the current officials well. I can just handle it.', 1, { d: -12, b: -8 }]
-  ], tip: 'The answer to revolving-door concerns is recusal and disclosure.' },
-  { key: 'e_board', when: R => R.disc.includes('d_board'), q: 'You disclosed that you sit on a competitor\'s board — thank you for that. If we hire you, what happens?', opts: [
-    ['I resign that seat before starting and recuse from anything involving that company for a year.', 10, { b: 10, d: 3 }],
-    ['Keep both — it helps industry collaboration.', 1, { b: -15, d: -5 }],
-    ["I'll leave when my term ends.", 3, { b: -8 }],
-    ['I could bring their information over.', 0, { b: -15, d: -10, e: -5 }]
-  ] },
-  { key: 'e_board', when: R => !R.disc.includes('d_board'), q: "Our background check shows you're on a competitor's board — but you didn't disclose it in the conflict-of-interest section. Why?", opts: [
-    ["That was my mistake. I'm formally disclosing it now, and I'll resign before starting and recuse from related decisions.", 7, { b: 3 }],
-    ["I didn't think it mattered.", 1, { b: -15 }],
-    ["The form was long. I missed that question.", 2, { b: -10 }],
-    ['I was going to mention it later.', 1, { b: -12 }]
-  ], tip: 'Next time, check it in the "Voluntary Disclosures" step.' },
-  { key: 'e_youtube', q: 'Your channel unboxed 214 leather jackets. Honestly — are you here to cosplay Jensen?', opts: [
-    ['The channel taught me to talk to a million people. But this job needs governance and execution, not a jacket — and that\'s what I\'m ready for.', 8, { b: 5, e: 3 }],
-    ['Yes. Jacket number 215 is ready.', 2, { b: -10 }],
-    ["The leather jacket is NVIDIA's brand asset. I'll keep it going.", 3, { b: -4, e: -3 }],
-    ['I could do unboxings of our new chips.', 1, { b: -8, d: -2 }]
-  ] },
-  { key: 'e_dennys', q: "You washed dishes at Denny's? …Jensen is going to like that. What did that job teach you?", opts: [
-    ["Don't panic at the busiest hour: clear the dirtiest plates first, then the next thing. A crisis works the same way.", 9, { e: 6, b: 4 }],
-    ['How to make pancakes.', 3, { e: 2 }],
-    ['Honestly, I just wanted my résumé to look like Jensen\'s.', 1, { b: -8 }],
-    ['How to smile at customers.', 5, { w: 2 }]
-  ] },
-  { key: 'e_ceo', q: "You've been a public-company CEO. Tell me about a decision that was deeply unpopular at the time.", opts: [
-    ['I killed a profitable product line with no future and moved the team to the next generation. The stock fell that quarter; revenue doubled two years later.', 10, { b: 6, w: 6, e: 4 }],
-    ['Everyone always liked my decisions.', 1, { b: -8 }],
-    ['I cut 30% of staff and the stock went up.', 4, { w: 6, e: -10 }],
-    ['I delayed earnings to avoid a market panic.', 1, { w: -10, b: -6 }]
-  ] },
-  { key: 'e_coo', q: "You've run 60 data centers. Our biggest bottleneck right now is power. What would you do?", opts: [
-    ['Plan power with customers: long-term procurement, more performance per watt, and treat power as part of the roadmap.', 10, { w: 6, e: 6, d: 3 }],
-    ['Just build more data centers.', 3, { w: -3 }],
-    ["That's the customer's problem, not ours.", 1, { w: -6, e: -6 }],
-    ['Start building nuclear plants tomorrow.', 4, { d: -3 }]
-  ] },
-  { key: 'e_cco', q: "You've built export-control programs. NVIDIA has never had a dedicated compliance chief. What do you do in month one?", opts: [
-    ['Map high-risk customers and intermediaries, set up end-user audits, and have the compliance chief report directly to the Board.', 10, { d: 10, b: 8 }],
-    ['Write a 300-page compliance manual first.', 4, { e: -5, b: 2 }],
-    ['Shut down everything connected to China.', 2, { w: -8, e: -5 }],
-    ['Deal with it when something goes wrong.', 0, { d: -15, b: -10 }]
-  ] },
-  { key: 'e_cto', q: 'You stayed on to integrate your chip startup after the acquisition. Why do acquisitions so often fail?', opts: [
-    ['Because buyers buy the tech but lose the people. Keep the key engineers, respect their cadence, then connect to the main platform gradually.', 10, { e: 10, b: 3 }],
-    ['Because the acquired team takes the money and leaves.', 4, { e: -4 }],
-    ["Because they didn't switch to our tools immediately.", 3, { e: -6 }],
-    ["Acquisitions don't fail if you pay enough.", 1, { w: -6, b: -4 }]
-  ] },
-  { key: 'ed_online', q: 'Your education is the "Become a CEO in 7 Days" course. …What did they teach on day seven?', opts: [
-    ["Honestly, education isn't my strength — my track record is, and I can prove it.", 7, { b: 3 }],
-    ['Day seven was how to interview for CEO.', 3, { b: -4 }],
-    ['Day seven was rest. Like God.', 2, { b: -6, e: 2 }],
-    ["It's the best course in the industry.", 0, { b: -10 }]
-  ] },
-  { key: 'lowmatch', q: 'Frankly, your résumé scored low on our AI screen — but the Board still wanted to meet you. Why are you right for this?', opts: [
-    ["It scored low because my path isn't typical. But I bring what the company lacks most: governance, succession, and the ability to make people believe in a crisis.", 8, { b: 6 }],
-    ['AI screening is unreliable.', 2, { b: -6, e: -3 }],
-    ['Because I really want this job.', 3, { b: -3 }],
-    ["Because Jensen didn't have a résumé either.", 1, { b: -8 }]
-  ] }
-];
 
 // ---------- Final round: Jensen ----------
-const FINAL = [
-  { type: 'mc', q: "Sit. …Do you know how many days this company has always been from going out of business?", opts: [
-    ['30 days', 10], ['90 days', 2], ['365 days', 1], ["We'll never go out of business", 0]
-  ], good: "Right. I've said it for thirty years.", bad: "…You didn't do your homework." },
-  { type: 'mc', q: 'Speed of light. Tell me what it means.', opts: [
-    ['Compute the fastest physically possible time first, use that as the benchmark, then measure how far we are from it.', 10],
-    ['Just be faster than competitors.', 2],
-    ['Work overtime at light speed every day.', 0],
-    ['Ship something every quarter.', 2]
-  ], good: "Good. Don't compete with people. Compete with physics.", bad: "No. If you benchmark against rivals, you'll always be second." },
-  { type: 'order', time: 30, q: 'Six things on the whiteboard. Thirty seconds. Put them in order.', items: [
-    ["Founded at a Denny's", 1993], ['RIVA 128 saves the company', 1997], ['GeForce 256 and the IPO', 1999],
-    ['CUDA announced', 2006], ['AlexNet trained on two GTX 580s', 2012], ['DGX-1 hand-delivered to OpenAI', 2016]
-  ], good: 'You understand how this company survived.', bad: "If you can't order the history, how will you write the next chapter?" },
-  { type: 'mc', q: '"Zero-billion-dollar market." What does it mean? Give me an example.', opts: [
-    ['Investing while the market is still worth zero, and creating it — like CUDA in 2006.', 10],
-    ['If a market makes no money, abandon it.', 1],
-    ['Give the product away to grab share.', 3],
-    ['Markets like crypto mining.', 2]
-  ], good: 'Exactly. CUDA lost money for ten years.', bad: "If I thought like that, there'd be no AI today." },
-  { type: 'mc', q: '"The more you buy, the more you save." Use it to convince a penny-pinching CFO.', opts: [
-    ['Look at tokens per watt and per dollar: the new architecture lowers TCO while the AI factory\'s revenue goes up.', 10],
-    ['Buy more, get a bigger discount.', 3],
-    ['Chip prices will rise — stockpile now.', 2],
-    ['Because I said so.', 0]
-  ], good: 'Exactly. Compute equals revenue.', bad: "That's a salesman's answer, not a CEO's." },
-  { type: 'mc', q: "I have sixty direct reports and I don't do one-on-ones. Why?", opts: [
-    ['So everyone gets information at the same time — information shouldn\'t be power. I reason and give feedback in front of everyone so we all learn.', 10],
-    ["I'm too busy.", 2],
-    ["I don't trust them.", 0],
-    ['HR handles one-on-ones.', 1]
-  ], good: "Right. Information shouldn't be power.", bad: "You're still thinking like your old company." },
-  { type: 't5t', time: 40, q: 'Write me a T5T. The five most important things in your first 100 days.', items: [
-    ['Appoint our first Chief Compliance Officer and an export control committee', 2],
-    ['Create a COO role and a formal succession bench', 2],
-    ['Read T5Ts every day; protect the flat culture', 2],
-    ['Ship Rubin on time; lock in packaging and HBM capacity', 2],
-    ['Fully disclose backstops and off-balance-sheet exposure on the call', 2],
-    ['Testify before Congress proactively and offer briefings', 2],
-    ['Replace the company logo to mark a new era', -2],
-    ['Renegotiate my own compensation package', -2],
-    ['Acquire a social media company', -2],
-    ['$100B buyback to prop up the stock', 0],
-    ['Move HQ to Texas for taxes', -1]
-  ], good: "I'll read this T5T twice.", bad: 'Half of your top five are about you.' },
-  { type: 'mc', q: 'At Stanford I wished students "ample doses of pain and suffering." How do you understand that?', opts: [
-    ['Greatness comes from character, and character is forged in people who have suffered and kept going.', 10],
-    ['He wanted them to fail.', 1],
-    ['It was just a joke in a speech.', 3],
-    ['He meant they should work more overtime.', 1]
-  ], good: "…You've suffered too. I can tell.", bad: "You haven't really hurt yet." },
-  { type: 'mc', q: "After Blackwell comes Rubin. What's the 2028 architecture called?", opts: [
-    ['Feynman', 10], ['Turing', 1], ['Hopper', 1], ['Newton', 0]
-  ], good: "Feynman. He'd have liked that.", bad: 'Turing and Hopper are history.' },
-  { type: 'mc', q: 'In front of the Board, right now: how would you evaluate me? Be honest.', opts: [
-    ['You built the infrastructure of the AI era. But the company depends too much on one person: no succession, no compliance chief, too much concentrated power. That is what I\'ll fix.', 10],
-    ['You are the greatest CEO in history, with no flaws.', 1],
-    ['Your private life destroyed this company.', 2],
-    ["I don't comment on my predecessors.", 4]
-  ], good: "…Thank you for not flattering me.", bad: "I don't need a fan. I need a successor." },
-  { type: 'mc', q: 'Last question. If the AI bubble bursts tomorrow, what should NVIDIA do?', opts: [
-    ["We've always been 30 days from going out of business: protect cash and supply-chain flexibility, keep the one-year cadence, and push computing into the next zero-billion-dollar markets — robotics, science.", 10],
-    ['Lay off half the company immediately.', 3],
-    ["That won't happen.", 1],
-    ['Go back to focusing on gaming GPUs.', 3]
-  ], good: '…', bad: "Bubbles don't kill us. Panic does." }
-];
 
 const JENSEN_LINES = {
   join: "Mm. Let's begin. I don't have much time.",
@@ -1610,6 +1358,265 @@ const ENDING = [
   { mood: 'smile', t: '…Thank you.' },
   { mood: 'smile', t: "This empire is yours now. The mission is the boss — finish it." },
   { mood: 'smile', t: "Oh, and this jacket… it's yours. It fits the job better than it fits me now." }
+];
+
+// ===== Question bank (English) v2: similar-length options; wrong answers sound reasonable but have a fatal flaw =====
+
+const ROUND1 = [
+  { who: 'kress', fixed: true, q: "Let's warm up. In one sentence: why you?", opts: [
+    ["Keep Jensen's direction, and end our reliance on one person.", 10, { b: 10, e: 4, w: 4, d: 4 }],
+    ["I'll bring NVIDIA back to the Jensen era and change nothing.", 3, { e: 6, b: -10 }],
+    ["I'll get the stock back to $239 first; governance reforms can come after that.", 4, { w: 6, b: -6, e: -4 }],
+    ['I already bought the leather jacket. Same size as his.', 1, { b: -10, e: -3 }]
+  ], tip: 'The Board wants continuity AND a fix for depending on one person.' },
+  { who: 'kress', q: "Basics: roughly what was NVIDIA's FY2026 revenue (year ended January 2026)?", opts: [
+    ['About $215.9B', 10, { w: 8 }], ['About $193.7B', 4, { w: -2 }], ['About $130.5B', 2, { w: -5 }], ['About $250.0B', 1, { w: -6 }]
+  ], tip: '$193.7B was data center revenue only; $130.5B was FY2025.', clue: 'numbers' },
+  { who: 'kress', q: "Earnings are 11/17 and I've been interim CEO for five days. If you were CEO, how would you run that call?", opts: [
+    ['As scheduled: the Chair covers the transition, then the numbers.', 10, { b: 8, w: 10 }],
+    ['As scheduled, but numbers only. No questions about the transition.', 5, { w: 2, b: -3, e: -3 }],
+    ["Delay a week so we can present the Board's investigation findings too.", 2, { w: -15, b: -4 }],
+    ['As scheduled, and unveil a new ten-year AI vision to change the story.', 3, { w: -4, b: -8 }]
+  ], tip: "In a crisis: business as usual, and address the transition head-on." },
+  { who: 'kress', q: 'Roughly how many direct reports did Jensen have? Did we have a COO, or a dedicated compliance chief?', opts: [
+    ['About 60 · COO: no · CCO: no', 10, { b: 8 }],
+    ['About 60 · COO: no · CCO: yes', 4, { b: -2 }],
+    ['About 60 · COO: yes · CCO: no', 4, { b: -2 }],
+    ['About 36 · COO: yes · CCO: no', 1, { b: -6 }]
+  ], tip: 'Compliance was handled by a committee of the CFO, EVP Ops and SVP HR.', clue: 'gov' },
+  { who: 'kress', q: 'So how would you change the org?', opts: [
+    ['Keep flat + T5Ts, add a COO and compliance chief, build a bench.', 10, { b: 10, e: 3, d: 5 }],
+    ['Keep flat + T5Ts, keep 60 directs, leave succession to the Board.', 4, { e: 6, b: -8 }],
+    ['Hire a COO and have all 60 direct reports report to the COO.', 5, { b: 5, e: -10 }],
+    ['Follow the consultants: five business units, each with a president.', 3, { b: 2, e: -8, w: -2 }]
+  ], tip: "Flat is a strength; depending on one person is the risk. Handle both." },
+  { who: 'kress', q: 'H200 sales to China are licensed with conditions, but reports point to diversion and security risks. Your strategy?', opts: [
+    ['Ship under license, plus an independent export committee and audits.', 10, { d: 12, b: 6, w: -2 }],
+    ['Pause all China shipments until the congressional hearings are over.', 6, { d: 6, w: -10, e: -2 }],
+    ['Ship under license and let the existing legal team handle it quietly.', 2, { d: -12, b: -8, w: 4 }],
+    ['Route China orders through our Singapore subsidiary so shipments continue and U.S. risk drops.', 0, { d: -15, b: -10 }]
+  ], tip: 'A license lets you sell — but you must prove where the chips actually go.', clue: 'dc' },
+  { who: 'kress', q: 'Investors are worried about the $105B OpenAI and $36B neocloud backstops. Asked on the call, what do you say?', opts: [
+    ['Disclose the full exposure and stress tests, and cap total backstops.', 10, { w: 12, b: 6 }],
+    ['Disclose the total, but keep customer-level terms confidential.', 6, { w: 4, b: 2 }],
+    ["Orders run through 2028; no extra disclosure needed.", 3, { w: -10, b: -4 }],
+    ['Announce that every backstop is cancelled, effective immediately.', 3, { w: -4, e: -4, b: -4 }]
+  ], tip: "Full disclosure plus a cap moves the trust from Jensen to the company.", clue: 'money' },
+  { who: 'kress', q: 'People left flowers at our sign and employees cried. Day one, all-hands: your first sentence?', opts: [
+    ['"Thank you, Jensen, for 33 years. The mission hasn\'t changed. I\'ll listen first."', 10, { e: 12, b: 3 }],
+    ['"This week proved one thing: from today on, this company can never depend on one person again."', 5, { b: 6, e: -6 }],
+    ['"I know you\'re worried about the stock. Your RSUs and pay won\'t change."', 5, { e: 3, w: 2 }],
+    ['"Let\'s put the past behind us and focus on next quarter."', 2, { e: -12 }]
+  ], tip: 'Day one is about steadying people; structural fixes come later.', clue: 'eng' },
+  { who: 'kress', q: 'The President posted that Tim Cook should get this job. A reporter stops you outside CNBC. You say:', opts: [
+    ['"Tim is a legend. The Board decides through its process; I\'m focused on work."', 10, { d: 6, b: 8 }],
+    ['"Thanks. I\'ll call the President myself to explain my plan."', 3, { d: 2, b: -12 }],
+    ['"The President\'s view matters, and the Board should take it seriously."', 4, { d: 4, b: -10 }],
+    ['"Tim knows phones, not AI chips. This job isn\'t for him."', 2, { d: -12, b: -4 }]
+  ], tip: "Don't pick sides, don't go around the Board, don't put others down." },
+  { who: 'kress', q: "Quick fact check: who is interim CEO right now, and who is our first-ever Board Chair?", opts: [
+    ['Colette Kress / Harvey C. Jones', 10, { b: 8 }],
+    ['Colette Kress / Stephen Neal', 4, { b: -3 }],
+    ['Harvey C. Jones / Colette Kress', 3, { b: -4 }],
+    ['Stephen Neal / Harvey C. Jones', 2, { b: -6 }]
+  ], tip: 'Stephen Neal is the lead independent director, not the Chair.', clue: 'official' },
+  { who: 'kress', q: "Google TPUs, AWS Trainium and Broadcom's custom ASICs are all chasing orders. What's our moat?", opts: [
+    ['CUDA software plus system integration of the whole AI factory.', 10, { e: 8, w: 5 }],
+    ["Packaging capacity: we've locked up most of TSMC's CoWoS supply, so rivals can't ship.", 6, { w: 4, d: -2 }],
+    ['Raw chip performance: every generation is twice as fast as rivals.', 4, { e: 2, w: -2 }],
+    ['Scale from 90% share, so nobody can match us on price.', 3, { w: -4, e: -3 }]
+  ], tip: 'Rivals can catch a single chip. They can\'t catch the software and the whole system.' },
+  { who: 'kress', q: 'Our ~$12.9B Hugging Face deal is under DOJ review and open-source developers are nervous. How do you handle it?', opts: [
+    ['Commit to hardware neutrality and independent governance; cooperate fully.', 10, { d: 8, e: 5, b: 5 }],
+    ['Cooperate, then quietly favor our own GPUs after closing.', 2, { d: -12, e: -8 }],
+    ['Withdraw the deal to avoid a head-on fight with the DOJ.', 5, { w: -5, d: 3 }],
+    ['Accelerate the close so it finishes before the review concludes.', 0, { d: -15, b: -10 }]
+  ], clue: 'dc' },
+  { who: 'kress', q: 'Tell me about a time you failed.', opts: [
+    ['A decision I got wrong, what it cost, and what I changed.', 10, { b: 6, e: 6 }],
+    ['A project my team botched, and how I personally stepped in and cleaned up the mess.', 4, { e: -6, b: 2 }],
+    ['A time everyone opposed me, and I turned out to be right.', 3, { b: -6 }],
+    ['"Honestly, my biggest weakness is that I\'m too hard on myself."', 1, { b: -8, e: -3 }]
+  ], tip: 'A failure question wants "where I was wrong" — not "others were wrong" or "I was right."' },
+  { who: 'kress', q: "Two of Jensen's children and his son-in-law work here. How do you handle it?", opts: [
+    ['Keep them; a Board committee reviews their pay and promotions, disclosed.', 10, { b: 10, e: 3 }],
+    ['Put them on temporary leave until the independent investigation is complete, then reinstate.', 4, { e: -6, b: 2 }],
+    ['Let them all go to avoid any appearance of favoritism.', 3, { e: -8, b: -3 }],
+    ["Leave it as is. They're strong performers anyway.", 3, { b: -8 }]
+  ], tip: 'Fair (no penalty for the last name) and transparent (no perks for it).', clue: 'cand' }
+];
+
+const RESUME_Q = [
+  { key: 'ko_q_rel', q: 'On your application you checked "undisclosed intimate relationship with a direct report." This week of all weeks. What would you like to say?', opts: [
+    ["I chose honesty, and I accept an independent review.", 7, { b: 4 }],
+    ['It was consensual, and it never affected a single decision.', 2, { b: -12 }],
+    ["I'll explain, but I'd prefer it stay out of the Board minutes.", 1, { b: -15 }],
+    ["I've already left that company, so the matter is closed.", 3, { b: -6 }]
+  ], tip: 'This week, the only way through is honesty plus accepting an investigation.' },
+  { key: 'ko_q_bg', q: "You declined a background check on your application. After this week, you can see why that worries us. Why?", opts: [
+    ['I withdraw that. I consent to a full background check today.', 6, { b: 3 }],
+    ["I'll consent, but I'd like the financial portion excluded.", 3, { b: -6 }],
+    ['My last employer already did one; reuse that.', 2, { b: -8 }],
+    ['I trust the Board, but not outside investigation firms.', 2, { b: -8 }]
+  ] },
+  { key: 'ko_q_ent', q: 'You said you do business with a company on the Entity List. You know Congress is watching us?', opts: [
+    ['Cut ties before I start and self-report to regulators.', 6, { d: 5, b: 3 }],
+    ["Wind it down after I start, so customers aren't hurt.", 2, { d: -10, b: -6 }],
+    ["Hand it to a family member, so it's not my conflict anymore.", 0, { d: -15, b: -15 }],
+    ["That company will probably come off the list next month.", 1, { d: -12 }]
+  ] },
+  { key: 'e_inventor', q: 'Your résumé says "Inventor of the GPU." Our background check found nothing. Care to explain?', opts: [
+    ["That line overstated it. I'll withdraw it.", 8, { b: 6 }],
+    ['I worked on the first GPUs; I just never got the credit.', 3, { b: -6 }],
+    ['"Invented" is a metaphor. I mean I redefined what a GPU is.', 2, { b: -8 }],
+    ['My lawyer will follow up with the background check firm.', 1, { b: -12 }]
+  ], tip: 'When a padded résumé gets caught: admit it and correct it, immediately.' },
+  { key: 'e_hedge', q: 'You shorted NVDA last week and made $2 billion. How will our engineers see you?', opts: [
+    ['Close every short, commit to no opposing trades, disclose it.', 9, { e: 8, b: 6, w: 3 }],
+    ["I'll donate every dollar of the gain to an employee fund; that should close the chapter.", 5, { e: 4, b: -2 }],
+    ["It shows I'm rational — I don't let feelings cloud my judgment.", 3, { e: -10, w: 3 }],
+    ["I'll keep the position as a hedge against company risk.", 0, { e: -15, b: -15 }]
+  ], tip: 'Donating is a gesture; closing, committing and disclosing is a system.' },
+  { key: 'e_crypto', q: 'The crypto exchange you founded collapsed in 2022. How do you convince the Board it won\'t happen again?', opts: [
+    ['No risk controls, no transparency. Those are now my first priority.', 9, { b: 8, w: 4 }],
+    ['After the collapse I repaid every user in full from my own money, so it\'s fully resolved.', 4, { b: -2 }],
+    ['It was an industry-wide winter. We were simply unlucky.', 2, { b: -10 }],
+    ['It taught me that in a crisis, you protect yourself first.', 1, { b: -12, e: -4 }]
+  ], tip: 'For past failures: say exactly what went wrong, then how you prevent it now.' },
+  { key: 'e_gov', q: 'You wrote chip export rules at Commerce; now you want to run a company you regulated. Revolving door?', opts: [
+    ['I honor the cooling-off period, recuse, and disclose.', 9, { d: 10, b: 6 }],
+    ['I know the gray areas, so I can help us sell more within the law.', 2, { d: -12, b: -6 }],
+    ["I'll push Commerce to loosen China export rules once I'm in.", 2, { d: -10, w: 3 }],
+    ['I can ask former colleagues to speed up our license reviews.', 0, { d: -15, b: -10 }]
+  ], tip: 'The cure for revolving-door concerns is recusal and disclosure.' },
+  { key: 'e_board', when: R => R.disc.includes('d_board'), q: "You disclosed a seat on a competitor's board — thank you. If we hire you, what happens?", opts: [
+    ['Resign before starting; recuse from related decisions for a year.', 10, { b: 10, d: 3 }],
+    ["I'll step down to an advisor role instead and stay out of their board decisions entirely.", 3, { b: -8 }],
+    ["I'll resign after I start and juggle both during the transition.", 3, { b: -8 }],
+    ['I keep the seat; it could help the two companies collaborate.', 1, { b: -15, d: -5 }]
+  ] },
+  { key: 'e_board', when: R => !R.disc.includes('d_board'), q: "Our check shows you're on a competitor's board, but you didn't disclose it. Why?", opts: [
+    ["My mistake. I'm disclosing it now, and I'll resign and recuse.", 7, { b: 3 }],
+    ["They're not a direct competitor, so I didn't check the box.", 3, { b: -8 }],
+    ["I didn't think a board seat counted.", 2, { b: -10 }],
+    ['I planned to tell the Board privately after I was hired.', 1, { b: -12 }]
+  ], tip: 'Next time, check it in the "Voluntary Disclosures" step.' },
+  { key: 'e_youtube', q: 'Your channel unboxed 214 leather jackets. Honestly — are you here to cosplay Jensen?', opts: [
+    ['The channel taught me to communicate; this job needs governance.', 8, { b: 5, e: 3 }],
+    ['It proves I get the brand; the jacket culture lives on.', 3, { b: -4, e: -3 }],
+    ["I'll turn it into the official company channel for more reach.", 2, { b: -6 }],
+    ['Yes. Number 215 is already ordered, same size as his.', 1, { b: -10 }]
+  ] },
+  { key: 'e_dennys', q: "You washed dishes at Denny's? …Jensen will like that. What did it teach you?", opts: [
+    ['Clear the dirtiest plates first. Crises work the same way.', 9, { e: 6, b: 4 }],
+    ["Customer first — I'll apply that to our cloud customers.", 5, { w: 3 }],
+    ['To work long hours under pressure without needing rest.', 3, { e: -4 }],
+    ['Honestly, I listed it hoping Jensen would like it.', 2, { b: -6 }]
+  ] },
+  { key: 'e_ceo', q: "You've been a public-company CEO. Tell me about a decision that was unpopular at the time.", opts: [
+    ['Killed a profitable dead-end line; revenue doubled two years later.', 10, { b: 6, w: 6, e: 4 }],
+    ['Cut 30% of staff in one day and moved the savings into AI; the stock rose 12% that quarter.', 4, { w: 6, e: -10 }],
+    ['Delayed earnings a quarter to avoid panic during a transition.', 1, { w: -10, b: -6 }],
+    ['Honestly, my big decisions had near-unanimous support.', 2, { b: -8 }]
+  ] },
+  { key: 'e_coo', q: "You've run 60 data centers. Our biggest bottleneck now is power. What would you do?", opts: [
+    ['Long-term power deals, more perf per watt, power on the roadmap.', 10, { w: 6, e: 6, d: 3 }],
+    ['Allocate GPUs first to customers who already have power secured; everyone else waits in line.', 5, { w: 3, e: -2 }],
+    ['Build our own power plants and be energy-independent in three years.', 3, { w: -4, d: -2 }],
+    ["Power is the customer's problem; we should focus on chips.", 2, { w: -6, e: -4 }]
+  ] },
+  { key: 'e_cco', q: "You've built export-control programs. NVIDIA never had a dedicated compliance chief. Month one?", opts: [
+    ['Map high-risk customers and brokers; the CCO reports to the Board.', 10, { d: 10, b: 8 }],
+    ['Write a complete compliance manual and require company-wide training and sign-off within 90 days.', 4, { e: -5, b: 2 }],
+    ['Have the CCO report to the CFO and keep the current committee.', 3, { b: -6, d: -4 }],
+    ['Freeze all Asia business until the audit is complete.', 2, { w: -10, e: -4 }]
+  ] },
+  { key: 'e_cto', q: 'You stayed to integrate your startup after it was acquired. Why do integrations fail so often?', opts: [
+    ['They keep the tech but lose the people.', 10, { e: 10, b: 3 }],
+    ['Cultures clash, so acquired teams should stay fully independent.', 5, { e: 3, w: -3 }],
+    ["Integration is too slow; switch everyone to the parent's tools on day one.", 3, { e: -6 }],
+    ['The price was too low; pay enough and the team stays.', 2, { w: -6, e: -3 }]
+  ] },
+  { key: 'ed_online', q: 'Your education is the "Become a CEO in 7 Days" course. …What did they teach on day seven?', opts: [
+    ["Not my strength. My track record is.", 7, { b: 3 }],
+    ['Day seven was how to interview for CEO.', 3, { b: -4 }],
+    ["It's honestly more practical than a Harvard MBA.", 2, { b: -8 }],
+    ['I did go to college; I just left it off.', 1, { b: -10 }]
+  ] },
+  { key: 'lowmatch', q: 'Frankly, your résumé scored low on our AI screen, but the Board still wanted to meet you. Why you?', opts: [
+    ['My path is unusual, but I bring governance and succession.', 8, { b: 6 }],
+    ['Because the Board needs a complete outsider right now, someone with no ties to the old guard.', 4, { b: 2 }],
+    ["AI screens read keywords, not leadership.", 3, { b: -6, e: -3 }],
+    ["Jensen didn't have a résumé when he started, either.", 1, { b: -8 }]
+  ] }
+];
+
+const FINAL = [
+  { type: 'mc', q: 'Sit. …How many days has this company always been from going out of business?', opts: [
+    ['30 days', 10], ['100 days', 2], ['7 days', 3], ['365 days', 1]
+  ], good: "Right. I've said it for thirty years.", bad: "…You didn't do your homework." },
+  { type: 'mc', q: 'Speed of light. Tell me what it means.', opts: [
+    ['Find the physical limit of how fast it could be done; measure the gap.', 10],
+    ['Flatten every decision layer so information moves through the company as fast as light.', 5],
+    ['Benchmark against the fastest competitor, then find a way to beat them.', 2],
+    ['Cut every project schedule in half to force new approaches.', 3]
+  ], good: "Good. Don't compete with people. Compete with physics.", bad: "No. Benchmark against rivals and you'll always be second." },
+  { type: 'order', time: 30, q: 'Six things on the whiteboard. Thirty seconds. Put them in order.', items: [
+    ["Founded at a Denny's", 1993], ['RIVA 128 saves the company', 1997], ['GeForce 256 and the IPO', 1999],
+    ['CUDA announced', 2006], ['AlexNet trained on two GTX 580s', 2012], ['DGX-1 hand-delivered to OpenAI', 2016]
+  ], good: 'You understand how this company survived.', bad: "If you can't order the history, how will you write the next chapter?" },
+  { type: 'mc', q: '"Zero-billion-dollar market." What does it mean?', opts: [
+    ['Invest while the market is still worth zero, and create it.', 10],
+    ['Invest in new markets with no revenue target, only tech leadership.', 5],
+    ['Pick small markets with no competitors, and grow from there.', 4],
+    ['Sell at a loss to grab share, then charge once the market matures.', 3]
+  ], good: 'Exactly. CUDA lost money for ten years.', bad: "If I thought like that, there'd be no AI today." },
+  { type: 'mc', q: '"The more you buy, the more you save." Use it to convince a penny-pinching CFO.', opts: [
+    ['More tokens per watt and per dollar, so TCO actually falls.', 10],
+    ['More compute makes better models, customers earn more, and revenue follows naturally.', 5],
+    ['Supply is tight; buying more now locks in future capacity.', 4],
+    ['Bigger orders get bigger discounts, so the total cost goes down.', 3]
+  ], good: 'Exactly. Compute equals revenue.', bad: "That's a salesman's answer, not a CEO's." },
+  { type: 'mc', q: "I have sixty direct reports and no one-on-ones. Why?", opts: [
+    ["Everyone hears it at once. Information shouldn't be power.", 10],
+    ['Fewer layers, so I can manage frontline engineers directly.', 4],
+    ['Sixty one-on-ones take too long, so I hold big meetings.', 3],
+    ['Direct reports police each other; underperformers are visible.', 2]
+  ], good: "Right. Information shouldn't be power.", bad: "You're still thinking like your old company." },
+  { type: 't5t', time: 40, q: 'Write me a T5T. The five most important things in your first 100 days.', items: [
+    ['Appoint our first Chief Compliance Officer and an export committee', 2],
+    ['Create a COO role and a formal succession bench', 2],
+    ['Read T5Ts every day; protect the flat culture', 2],
+    ['Ship Rubin on time; lock in packaging and HBM capacity', 2],
+    ['Fully disclose backstops and off-balance-sheet exposure', 2],
+    ['Testify before Congress proactively and offer briefings', 2],
+    ['Replace the company logo to mark a new era', -2],
+    ['Renegotiate my own compensation package', -2],
+    ['Acquire a social media company', -2],
+    ['$100B buyback to prop up the stock', 0],
+    ['Move HQ to Texas for taxes', -1]
+  ], good: "I'll read this T5T twice.", bad: 'Half of your top five are about you.' },
+  { type: 'mc', q: 'At Stanford I wished students "ample doses of pain and suffering." What did I mean?', opts: [
+    ['Greatness comes from character, forged by suffering.', 10],
+    ['Successful people have failed, so fail early and often while young.', 5],
+    ['Smart people get arrogant; pain keeps them humble.', 4],
+    ["Startups hurt, so expect it and you're less likely to quit.", 4]
+  ], good: "…You've suffered too. I can tell.", bad: "You haven't really hurt yet." },
+  { type: 'mc', q: "After Blackwell comes Rubin. What's the 2028 GPU architecture called?", opts: [
+    ['Feynman', 10], ['Vera', 3], ['Kyber', 2], ['Hopper', 1]
+  ], good: "Feynman. He'd have liked that.", bad: 'Vera is the CPU. Kyber is the rack. Know the difference.' },
+  { type: 'mc', q: 'In front of the Board, right now: how would you evaluate me? Be honest.', opts: [
+    ['You built the foundation of AI, but the company depends too much on you.', 10],
+    ["I don't comment on predecessors. I focus on what comes next.", 5],
+    ['Your vision was right; the Board never pushed back.', 3],
+    ['The greatest CEO ever, just dragged down by private matters.', 2]
+  ], good: "…Thank you for not flattering me.", bad: "I don't need a fan. I need a successor." },
+  { type: 'mc', q: 'Last question. If the AI bubble bursts tomorrow, what should NVIDIA do?', opts: [
+    ['Protect cash, keep the yearly cadence, find the next $0B market.', 10],
+    ['Retreat to gaming and workstations until AI recovers.', 4],
+    ['Buy back more stock to show the market confidence.', 3],
+    ['Cut 30% of R&D at once to protect margins and the stock.', 2]
+  ], good: '…', bad: "Bubbles don't kill us. Panic does." }
 ];
 
 return {NEWS_DATE,POSTS,TRENDING,JD,EXPERIENCES,EDUCATIONS,SKILLS,SUMMARIES,SUMMARY_KEYWORDS,SCREENING,DISCLOSURES,ROUND1,RESUME_Q,FINAL,JENSEN_LINES,ENDING};
